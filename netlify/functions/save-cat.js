@@ -31,7 +31,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    const store = getStore('whiskerlog');
+    const store = getStore({
+      name: 'whiskerlog',
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_TOKEN,
+    });
     await store.setJSON(`cat_${id}`, data);
 
     return {
