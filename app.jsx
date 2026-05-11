@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -29,8 +29,8 @@ const CARE_CONFIG = {
     icon:      '💊',
     sub:       'Every 4–6 weeks',
     logLabel:  'flea treatment',
-    greenDays: 28,   // < 28d → green "On schedule"
-    amberDays: 42,   // 28–41d → amber "Due now", ≥ 42d → red "Overdue"
+    greenDays: 28,
+    amberDays: 42,
   },
   nails: {
     label:     'Nail Trim',
@@ -38,7 +38,7 @@ const CARE_CONFIG = {
     sub:       'Every ~4 weeks',
     logLabel:  'nail trim',
     greenDays: 28,
-    amberDays: 35,   // 28–34d → amber "Due now", ≥ 35d → red "Overdue"
+    amberDays: 35,
   },
 };
 
@@ -64,7 +64,7 @@ function daysLabel(days) {
   if (days === null) return '';
   if (days === 0)    return 'today';
   if (days === 1)    return 'yesterday';
-  return `${days} days ago`;
+  return `${days}d ago`;
 }
 
 function getStatus(entries, greenDays, amberDays) {
@@ -135,18 +135,14 @@ const styles = `
     position: sticky; top: 56px; z-index: 19;
   }
   .wl-cat-card {
-    background: white;
-    border: 2.5px solid #EDD9C5;
-    border-radius: 14px;
-    padding: 10px 6px;
-    text-align: center;
-    transition: all .12s;
+    background: white; border: 2.5px solid #EDD9C5;
+    border-radius: 14px; padding: 10px 6px;
+    text-align: center; transition: all .12s;
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     cursor: pointer;
   }
   .wl-cat-card.active {
-    border-color: #C96A3A;
-    background: #FFF5EE;
+    border-color: #C96A3A; background: #FFF5EE;
     box-shadow: 0 3px 12px rgba(201,106,58,.2);
   }
   .wl-cat-avatar {
@@ -216,7 +212,7 @@ const styles = `
   .wl-care-icon { font-size: 28px; flex-shrink: 0; line-height: 1; }
   .wl-care-body { flex: 1; min-width: 0; }
   .wl-care-label { font-size: 15px; font-weight: 700; color: #3D2010; }
-  .wl-care-last { font-size: 12px; color: #9E8070; margin-top: 2px; }
+  .wl-care-last  { font-size: 12px; color: #9E8070; margin-top: 2px; }
   .wl-care-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
   .wl-status-badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -238,12 +234,11 @@ const styles = `
     margin-bottom: 10px;
     box-shadow: 0 2px 10px rgba(180,100,40,.07);
     border: 1px solid rgba(220,170,130,.2);
-    display: flex; align-items: center; gap: 12px;
-    opacity: .5;
+    display: flex; align-items: center; gap: 12px; opacity: .5;
   }
   .wl-placeholder-icon { font-size: 28px; flex-shrink: 0; }
   .wl-placeholder-label { font-size: 15px; font-weight: 700; color: #3D2010; }
-  .wl-placeholder-sub { font-size: 13px; color: #6B4E38; margin-top: 2px; }
+  .wl-placeholder-sub   { font-size: 13px; color: #6B4E38; margin-top: 2px; }
   .wl-coming-badge {
     margin-left: auto; flex-shrink: 0;
     background: #FFF5EE; border: 1px solid #EDD9C5;
@@ -268,9 +263,7 @@ const styles = `
     from { transform: translateY(80px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  .wl-sheet-handle-wrap {
-    padding: 12px 0 6px; display: flex; justify-content: center; flex-shrink: 0;
-  }
+  .wl-sheet-handle-wrap { padding: 12px 0 6px; display: flex; justify-content: center; flex-shrink: 0; }
   .wl-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: #DDD3CB; }
   .wl-sheet-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -325,26 +318,66 @@ const styles = `
   .wl-log-feedback { margin-top: 8px; font-size: 12px; color: #9E8070; min-height: 18px; }
   .wl-log-feedback.error { color: #B03020; }
 
-  /* ── HISTORY (GROUPED BY DATE) ── */
+  /* ── HISTORY TABLE ── */
   .wl-history-empty { font-size: 14px; color: #BBA090; padding: 10px 0; font-style: italic; }
-  .wl-hist-group { margin-bottom: 12px; }
-  .wl-hist-group-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 7px; }
-  .wl-hist-group-date { font-size: 14px; font-weight: 700; color: #3D2010; }
-  .wl-hist-group-ago  { font-size: 12px; color: #9E8070; }
-  .wl-hist-chips { display: flex; gap: 7px; flex-wrap: wrap; }
-  .wl-hist-chip {
-    display: inline-flex; align-items: center; gap: 3px;
-    background: #FDF8F0; border: 1px solid rgba(220,170,130,.35);
-    border-radius: 16px; padding: 5px 8px 5px 12px;
-    font-size: 13px; font-weight: 700; color: #3D2010;
+  .wl-hist-table {
+    width: 100%; border-collapse: collapse; table-layout: fixed;
   }
-  .wl-hist-chip-del {
-    background: none; border: none; color: #C0A898;
-    font-size: 16px; line-height: 1; padding: 0 2px;
-    cursor: pointer; display: flex; align-items: center;
-    border-radius: 50%; transition: color .12s;
+  .wl-hist-table colgroup .col-date { width: 45%; }
+  .wl-hist-table colgroup .col-cat  { width: 18.33%; }
+  .wl-hist-table thead th {
+    font-size: 11px; font-weight: 800; color: #9E8070;
+    letter-spacing: .07em; text-transform: uppercase;
+    padding-bottom: 10px;
+    text-align: center;
   }
-  .wl-hist-chip-del:active { color: #D94030; }
+  .wl-hist-table thead th:first-child { text-align: left; }
+  .wl-hist-table tbody tr { border-top: 1px solid rgba(220,170,130,.2); }
+  .wl-hist-date-cell { padding: 9px 0; vertical-align: middle; }
+  .wl-hist-date-main { font-size: 13px; font-weight: 700; color: #3D2010; }
+  .wl-hist-date-sub  { font-size: 11px; color: #9E8070; margin-top: 2px; }
+  .wl-hist-cat-cell  { text-align: center; vertical-align: middle; }
+  .wl-hist-check-btn {
+    background: none; border: none;
+    color: #2AB25B; font-size: 17px; font-weight: 700;
+    padding: 8px 6px; cursor: pointer; border-radius: 8px;
+    line-height: 1; transition: background .12s;
+    display: inline-block;
+  }
+  .wl-hist-check-btn:active { background: #EDFAF1; }
+  .wl-hist-dash {
+    display: block; text-align: center;
+    color: #DDD3CB; font-size: 14px; padding: 8px 0; line-height: 1;
+    user-select: none;
+  }
+
+  /* ── CLEAR ALL HISTORY ── */
+  .wl-clear-section {
+    margin-top: 28px; padding-top: 18px;
+    border-top: 1px solid rgba(220,170,130,.2);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .wl-clear-btn {
+    background: none; border: 1.5px solid #DDD3CB;
+    border-radius: 20px; padding: 8px 22px;
+    font-size: 13px; font-weight: 700; color: #B0A090;
+    transition: all .12s;
+  }
+  .wl-clear-btn:active { border-color: #D94030; color: #D94030; }
+  .wl-clear-confirm {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .wl-clear-confirm-text { font-size: 13px; color: #6B4E38; font-weight: 600; }
+  .wl-clear-yes {
+    background: #D94030; color: white; border: none;
+    border-radius: 16px; padding: 7px 18px;
+    font-size: 13px; font-weight: 700;
+  }
+  .wl-clear-no {
+    background: #F0EAE4; color: #6B4E38; border: none;
+    border-radius: 16px; padding: 7px 18px;
+    font-size: 13px; font-weight: 700;
+  }
 
   /* ── DIARY PLACEHOLDER ── */
   .wl-diary-placeholder {
@@ -352,9 +385,9 @@ const styles = `
     justify-content: center; min-height: 60vh;
     gap: 14px; padding: 40px 24px; text-align: center;
   }
-  .wl-diary-placeholder-icon { font-size: 56px; opacity: .3; }
+  .wl-diary-placeholder-icon  { font-size: 56px; opacity: .3; }
   .wl-diary-placeholder-title { font-size: 18px; font-weight: 800; color: #3D2010; }
-  .wl-diary-placeholder-sub { font-size: 14px; color: #9E8070; line-height: 1.6; max-width: 280px; }
+  .wl-diary-placeholder-sub   { font-size: 14px; color: #9E8070; line-height: 1.6; max-width: 280px; }
   .wl-diary-badge {
     background: #FFF5EE; border: 1.5px solid #EDD9C5;
     border-radius: 20px; padding: 6px 18px;
@@ -450,13 +483,12 @@ function BottomSheet({ title, onClose, children }) {
 }
 
 // ─── MultiCareSheet ───────────────────────────────────────────────────────────
-// One date + cat toggles to log for multiple cats at once.
-// History shows all cats grouped by date.
-function MultiCareSheet({ type, catState, onLog, onDelete, saving }) {
+function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving }) {
   const cfg = CARE_CONFIG[type];
-  const [dateVal,  setDateVal]  = useState(todayISO());
-  const [selected, setSelected] = useState(CATS.map((c) => c.id)); // all on by default
-  const [feedback, setFeedback] = useState('');
+  const [dateVal,      setDateVal]      = useState(todayISO());
+  const [selected,     setSelected]     = useState(CATS.map((c) => c.id));
+  const [feedback,     setFeedback]     = useState('');
+  const [confirmClear, setConfirmClear] = useState(false);
 
   function toggleCat(id) {
     setSelected((prev) =>
@@ -487,22 +519,24 @@ function MultiCareSheet({ type, catState, onLog, onDelete, saving }) {
     onLog(dateVal, toLog);
   }
 
-  // Build history grouped by date, cats in display order, newest date first
+  function handleClearConfirm() {
+    setConfirmClear(false);
+    onClearAll(type);
+  }
+
+  // Build grouped history: one row per date, newest first
   const byDate = {};
   for (const cat of CATS) {
     for (const e of (catState[cat.id]?.data?.[type] || [])) {
-      if (!byDate[e.date]) byDate[e.date] = [];
-      byDate[e.date].push({ catId: cat.id, catName: cat.name });
+      if (!byDate[e.date]) byDate[e.date] = new Set();
+      byDate[e.date].add(cat.id);
     }
   }
   const grouped = Object.entries(byDate)
     .sort(([a], [b]) => b.localeCompare(a))
-    .map(([date, cats]) => ({
-      date,
-      cats: CATS.map((c) => cats.find((x) => x.catId === c.id)).filter(Boolean),
-    }));
+    .map(([date, catIdSet]) => ({ date, catIds: catIdSet }));
 
-  const totalEntries = grouped.reduce((sum, g) => sum + g.cats.length, 0);
+  const totalEntries = grouped.reduce((sum, g) => sum + g.catIds.size, 0);
 
   return (
     <>
@@ -550,36 +584,77 @@ function MultiCareSheet({ type, catState, onLog, onDelete, saving }) {
         </div>
       </div>
 
-      {/* ── History ── */}
+      {/* ── History table ── */}
       <div className="wl-section-label">History ({totalEntries} entries)</div>
+
       {grouped.length === 0 ? (
         <div className="wl-history-empty">No entries yet — log the first one above!</div>
       ) : (
-        grouped.map(({ date, cats }) => {
-          const days = getDaysSince(date);
-          return (
-            <div key={date} className="wl-hist-group">
-              <div className="wl-hist-group-header">
-                <span className="wl-hist-group-date">{formatDate(date)}</span>
-                <span className="wl-hist-group-ago">{daysLabel(days)}</span>
-              </div>
-              <div className="wl-hist-chips">
-                {cats.map(({ catId, catName }) => (
-                  <span key={catId} className="wl-hist-chip">
-                    {catName}
-                    <button
-                      className="wl-hist-chip-del"
-                      onClick={() => onDelete(type, date, catId)}
-                      title={`Remove ${catName}`}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
+        <table className="wl-hist-table">
+          <colgroup>
+            <col className="col-date" />
+            {CATS.map((c) => <col key={c.id} className="col-cat" />)}
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Date</th>
+              {CATS.map((c) => <th key={c.id}>{c.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {grouped.map(({ date, catIds }) => {
+              const days = getDaysSince(date);
+              return (
+                <tr key={date}>
+                  <td className="wl-hist-date-cell">
+                    <div className="wl-hist-date-main">{formatDate(date)}</div>
+                    <div className="wl-hist-date-sub">{daysLabel(days)}</div>
+                  </td>
+                  {CATS.map((cat) =>
+                    catIds.has(cat.id) ? (
+                      <td key={cat.id} className="wl-hist-cat-cell">
+                        <button
+                          className="wl-hist-check-btn"
+                          onClick={() => onDelete(type, date, cat.id)}
+                          title={`Remove ${cat.name} on ${formatDate(date)}`}
+                        >
+                          ✓
+                        </button>
+                      </td>
+                    ) : (
+                      <td key={cat.id} className="wl-hist-cat-cell">
+                        <span className="wl-hist-dash">—</span>
+                      </td>
+                    )
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {/* ── Clear all history ── */}
+      {totalEntries > 0 && (
+        <div className="wl-clear-section">
+          {confirmClear ? (
+            <div className="wl-clear-confirm">
+              <span className="wl-clear-confirm-text">
+                Remove all {totalEntries} entries?
+              </span>
+              <button className="wl-clear-yes" onClick={handleClearConfirm}>
+                Yes, clear
+              </button>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>
+                Cancel
+              </button>
             </div>
-          );
-        })
+          ) : (
+            <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>
+              Clear all history
+            </button>
+          )}
+        </div>
       )}
     </>
   );
@@ -605,13 +680,10 @@ function CatSelector({ activeCatId, onSelect, catData }) {
 }
 
 // ─── CatsSection ──────────────────────────────────────────────────────────────
-// Renders per-cat status cards. Sheet lives at App level now.
 function CatsSection({ catId, data, onOpenSheet }) {
   const cat = CATS.find((c) => c.id === catId);
-
   return (
     <div className="wl-content">
-      {/* Profile card */}
       <div className="wl-profile-card">
         <div className="wl-profile-avatar">
           {data?.photo ? <img src={data.photo} alt={cat.name} /> : '🐱'}
@@ -622,21 +694,9 @@ function CatsSection({ catId, data, onOpenSheet }) {
         </div>
       </div>
 
-      {/* Flea Medicine — LIVE */}
-      <CareCard
-        type="flea"
-        entries={data?.flea ?? []}
-        onTap={() => onOpenSheet('flea')}
-      />
+      <CareCard type="flea"  entries={data?.flea  ?? []} onTap={() => onOpenSheet('flea')}  />
+      <CareCard type="nails" entries={data?.nails ?? []} onTap={() => onOpenSheet('nails')} />
 
-      {/* Nail Trim — LIVE */}
-      <CareCard
-        type="nails"
-        entries={data?.nails ?? []}
-        onTap={() => onOpenSheet('nails')}
-      />
-
-      {/* Placeholder cards (Steps 3–5) */}
       {[
         { icon: '🏥', label: 'Vet Visits',     sub: 'Checkups & vaccines'  },
         { icon: '⚖️', label: 'Weight',         sub: 'Track over time'       },
@@ -675,7 +735,7 @@ function DiarySection() {
 function App() {
   const [activeTab,    setActiveTab]   = useState('cats');
   const [activeCatId, setActiveCatId] = useState('pip');
-  const [openSheet,   setOpenSheet]   = useState(null); // 'flea' | 'nails' | null
+  const [openSheet,   setOpenSheet]   = useState(null);
   const [saving,      setSaving]      = useState(false);
 
   const [catState, setCatState] = useState({
@@ -683,6 +743,10 @@ function App() {
     parker: { status: 'idle', data: null },
     ollie:  { status: 'idle', data: null },
   });
+
+  // ── Always-fresh ref so callbacks never close over stale catState ──────────
+  const catStateRef = useRef(catState);
+  useEffect(() => { catStateRef.current = catState; });
 
   const loadCat = useCallback(async (id) => {
     setCatState((prev) => ({ ...prev, [id]: { ...prev[id], status: 'loading' } }));
@@ -695,16 +759,17 @@ function App() {
     }
   }, []);
 
-  // Eagerly load all three cats on mount — multi-cat sheet needs them all
+  // Eagerly load all three cats on mount
   useEffect(() => {
     CATS.forEach((cat) => loadCat(cat.id));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Log one date for one or more cats; save each in parallel
+  // ── Log one date for one or more cats ─────────────────────────────────────
   const handleMultiLog = useCallback(async (type, date, catIds) => {
+    const cs = catStateRef.current;                          // always fresh
     const updates = catIds
       .map((id) => {
-        const data = catState[id]?.data;
+        const data = cs[id]?.data;
         if (!data) return null;
         return { id, data: { ...data, [type]: [...(data[type] || []), { date }] } };
       })
@@ -712,13 +777,11 @@ function App() {
 
     if (updates.length === 0) return;
 
-    // Optimistic update
     setCatState((prev) => {
       const next = { ...prev };
       for (const { id, data } of updates) next[id] = { ...next[id], data };
       return next;
     });
-
     setSaving(true);
     try {
       await Promise.all(updates.map(({ id, data }) => saveCat(id, data)));
@@ -727,11 +790,11 @@ function App() {
     } finally {
       setSaving(false);
     }
-  }, [catState]);
+  }, []); // stable — reads via ref
 
-  // Delete a single cat's entry for a given date
+  // ── Delete one cat's entry for a given date ───────────────────────────────
   const handleDelete = useCallback(async (type, date, catId) => {
-    const data = catState[catId]?.data;
+    const data = catStateRef.current[catId]?.data;           // always fresh
     if (!data) return;
     const updated = { ...data, [type]: (data[type] || []).filter((e) => e.date !== date) };
 
@@ -744,7 +807,35 @@ function App() {
     } finally {
       setSaving(false);
     }
-  }, [catState]);
+  }, []); // stable — reads via ref
+
+  // ── Clear all entries for a given type across all cats ────────────────────
+  const handleClearAll = useCallback(async (type) => {
+    const cs = catStateRef.current;                          // always fresh
+    const updates = CATS
+      .map((cat) => {
+        const data = cs[cat.id]?.data;
+        if (!data) return null;
+        return { id: cat.id, data: { ...data, [type]: [] } };
+      })
+      .filter(Boolean);
+
+    if (updates.length === 0) return;
+
+    setCatState((prev) => {
+      const next = { ...prev };
+      for (const { id, data } of updates) next[id] = { ...next[id], data };
+      return next;
+    });
+    setSaving(true);
+    try {
+      await Promise.all(updates.map(({ id, data }) => saveCat(id, data)));
+    } catch (err) {
+      console.error('Clear failed:', err);
+    } finally {
+      setSaving(false);
+    }
+  }, []); // stable — reads via ref
 
   const { status, data } = catState[activeCatId];
   const catDataMap = Object.fromEntries(CATS.map((c) => [c.id, catState[c.id].data]));
@@ -753,7 +844,6 @@ function App() {
     <>
       <style>{styles}</style>
 
-      {/* ── Header ── */}
       <header className="wl-header">
         <span className="wl-header-icon">🐾</span>
         <div>
@@ -792,11 +882,7 @@ function App() {
               </div>
             )}
             {status === 'loaded' && (
-              <CatsSection
-                catId={activeCatId}
-                data={data}
-                onOpenSheet={setOpenSheet}
-              />
+              <CatsSection catId={activeCatId} data={data} onOpenSheet={setOpenSheet} />
             )}
             {status === 'idle' && (
               <div className="wl-state"><div className="wl-spinner" /></div>
@@ -807,7 +893,6 @@ function App() {
         {activeTab === 'diary' && <DiarySection />}
       </div>
 
-      {/* ── Bottom nav ── */}
       <nav className="wl-bottom-nav">
         <button
           className={`wl-nav-tab${activeTab === 'cats' ? ' active' : ''}`}
@@ -825,7 +910,6 @@ function App() {
         </button>
       </nav>
 
-      {/* ── Multi-cat sheet (lives at App level, not per-cat) ── */}
       {openSheet && (
         <BottomSheet
           title={`${CARE_CONFIG[openSheet].icon} ${CARE_CONFIG[openSheet].label}`}
@@ -836,6 +920,7 @@ function App() {
             catState={catState}
             onLog={handleMultiLog}
             onDelete={handleDelete}
+            onClearAll={handleClearAll}
             saving={saving}
           />
         </BottomSheet>
