@@ -43,8 +43,15 @@ const CARE_CONFIG = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Use local date parts — avoids UTC-vs-local timezone bug where evenings in
+// Pacific time would return tomorrow's date via toISOString()
 function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function formatDate(iso) {
@@ -473,10 +480,11 @@ function BottomSheet({ title, onClose, children }) {
 }
 
 // ─── MultiCareSheet ───────────────────────────────────────────────────────────
-function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving }) {
+function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClearAll, saving }) {
   const cfg = CARE_CONFIG[type];
   const [dateVal,      setDateVal]      = useState(todayISO());
-  const [selected,     setSelected]     = useState(CATS.map((c) => c.id));
+  // Pre-select only the cat whose card was tapped; others remain toggleable
+  const [selected,     setSelected]     = useState([defaultCatId]);
   const [feedback,     setFeedback]     = useState('');
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -506,8 +514,6 @@ function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving })
     } else {
       setFeedback('');
     }
-
-    // ── THE FIX: pass type as the first argument ──────────────────────────
     onLog(type, dateVal, toLog);
   }
 
@@ -664,6 +670,7 @@ function CatSelector({ activeCatId, onSelect, catData }) {
 }
 
 // ─── CatsSection ──────────────────────────────────────────────────────────────
+// onOpenSheet(type, catId) — passes the active cat so the sheet pre-selects it
 function CatsSection({ catId, data, onOpenSheet }) {
   const cat = CATS.find((c) => c.id === catId);
   return (
@@ -678,8 +685,8 @@ function CatsSection({ catId, data, onOpenSheet }) {
         </div>
       </div>
 
-      <CareCard type="flea"  entries={data?.flea  ?? []} onTap={() => onOpenSheet('flea')}  />
-      <CareCard type="nails" entries={data?.nails ?? []} onTap={() => onOpenSheet('nails')} />
+      <CareCard type="flea"  entries={data?.flea  ?? []} onTap={() => onOpenSheet('flea',  catId)} />
+      <CareCard type="nails" entries={data?.nails ?? []} onTap={() => onOpenSheet('nails', catId)} />
 
       {[
         { icon: '🏥', label: 'Vet Visits',     sub: 'Checkups & vaccines' },
@@ -719,6 +726,7 @@ function DiarySection() {
 function App() {
   const [activeTab,    setActiveTab]   = useState('cats');
   const [activeCatId, setActiveCatId] = useState('pip');
+  // openSheet: null | { type: 'flea'|'nails', catId: string }
   const [openSheet,   setOpenSheet]   = useState(null);
   const [saving,      setSaving]      = useState(false);
 
@@ -896,11 +904,12 @@ function App() {
 
       {openSheet && (
         <BottomSheet
-          title={`${CARE_CONFIG[openSheet].icon} ${CARE_CONFIG[openSheet].label}`}
+          title={`${CARE_CONFIG[openSheet.type].icon} ${CARE_CONFIG[openSheet.type].label}`}
           onClose={() => setOpenSheet(null)}
         >
           <MultiCareSheet
-            type={openSheet}
+            type={openSheet.type}
+            defaultCatId={openSheet.catId}
             catState={catState}
             onLog={handleMultiLog}
             onDelete={handleDelete}
