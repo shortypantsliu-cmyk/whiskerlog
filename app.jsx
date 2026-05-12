@@ -874,7 +874,7 @@ function App() {
               </div>
             )}
             {status === 'loaded' && (
-              <CatsSection catId={activeCatId} data={data} onOpenSheet={setOpenSheet} />
+              <CatsSection catId={activeCatId} data={data} onOpenSheet={(type, catId) => setOpenSheet({ type, catId })}      />
             )}
             {status === 'idle' && (
               <div className="wl-state"><div className="wl-spinner" /></div>
