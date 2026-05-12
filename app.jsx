@@ -236,7 +236,7 @@ const styles = `
     border: 1px solid rgba(220,170,130,.2);
     display: flex; align-items: center; gap: 12px; opacity: .5;
   }
-  .wl-placeholder-icon { font-size: 28px; flex-shrink: 0; }
+  .wl-placeholder-icon  { font-size: 28px; flex-shrink: 0; }
   .wl-placeholder-label { font-size: 15px; font-weight: 700; color: #3D2010; }
   .wl-placeholder-sub   { font-size: 13px; color: #6B4E38; margin-top: 2px; }
   .wl-coming-badge {
@@ -320,35 +320,28 @@ const styles = `
 
   /* ── HISTORY TABLE ── */
   .wl-history-empty { font-size: 14px; color: #BBA090; padding: 10px 0; font-style: italic; }
-  .wl-hist-table {
-    width: 100%; border-collapse: collapse; table-layout: fixed;
-  }
-  .wl-hist-table colgroup .col-date { width: 45%; }
-  .wl-hist-table colgroup .col-cat  { width: 18.33%; }
+  .wl-hist-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .wl-hist-table thead th {
     font-size: 11px; font-weight: 800; color: #9E8070;
     letter-spacing: .07em; text-transform: uppercase;
-    padding-bottom: 10px;
-    text-align: center;
+    padding-bottom: 10px; text-align: center;
   }
   .wl-hist-table thead th:first-child { text-align: left; }
   .wl-hist-table tbody tr { border-top: 1px solid rgba(220,170,130,.2); }
-  .wl-hist-date-cell { padding: 9px 0; vertical-align: middle; }
-  .wl-hist-date-main { font-size: 13px; font-weight: 700; color: #3D2010; }
-  .wl-hist-date-sub  { font-size: 11px; color: #9E8070; margin-top: 2px; }
-  .wl-hist-cat-cell  { text-align: center; vertical-align: middle; }
+  .wl-hist-date-cell  { padding: 9px 0; vertical-align: middle; width: 45%; }
+  .wl-hist-date-main  { font-size: 13px; font-weight: 700; color: #3D2010; }
+  .wl-hist-date-sub   { font-size: 11px; color: #9E8070; margin-top: 2px; }
+  .wl-hist-cat-cell   { text-align: center; vertical-align: middle; width: 18.33%; }
   .wl-hist-check-btn {
     background: none; border: none;
     color: #2AB25B; font-size: 17px; font-weight: 700;
     padding: 8px 6px; cursor: pointer; border-radius: 8px;
-    line-height: 1; transition: background .12s;
-    display: inline-block;
+    line-height: 1; transition: background .12s; display: inline-block;
   }
   .wl-hist-check-btn:active { background: #EDFAF1; }
   .wl-hist-dash {
     display: block; text-align: center;
-    color: #DDD3CB; font-size: 14px; padding: 8px 0; line-height: 1;
-    user-select: none;
+    color: #DDD3CB; font-size: 14px; padding: 8px 0; line-height: 1; user-select: none;
   }
 
   /* ── CLEAR ALL HISTORY ── */
@@ -360,8 +353,7 @@ const styles = `
   .wl-clear-btn {
     background: none; border: 1.5px solid #DDD3CB;
     border-radius: 20px; padding: 8px 22px;
-    font-size: 13px; font-weight: 700; color: #B0A090;
-    transition: all .12s;
+    font-size: 13px; font-weight: 700; color: #B0A090; transition: all .12s;
   }
   .wl-clear-btn:active { border-color: #D94030; color: #D94030; }
   .wl-clear-confirm {
@@ -370,13 +362,11 @@ const styles = `
   .wl-clear-confirm-text { font-size: 13px; color: #6B4E38; font-weight: 600; }
   .wl-clear-yes {
     background: #D94030; color: white; border: none;
-    border-radius: 16px; padding: 7px 18px;
-    font-size: 13px; font-weight: 700;
+    border-radius: 16px; padding: 7px 18px; font-size: 13px; font-weight: 700;
   }
   .wl-clear-no {
     background: #F0EAE4; color: #6B4E38; border: none;
-    border-radius: 16px; padding: 7px 18px;
-    font-size: 13px; font-weight: 700;
+    border-radius: 16px; padding: 7px 18px; font-size: 13px; font-weight: 700;
   }
 
   /* ── DIARY PLACEHOLDER ── */
@@ -516,7 +506,9 @@ function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving })
     } else {
       setFeedback('');
     }
-    onLog(dateVal, toLog);
+
+    // ── THE FIX: pass type as the first argument ──────────────────────────
+    onLog(type, dateVal, toLog);
   }
 
   function handleClearConfirm() {
@@ -591,14 +583,10 @@ function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving })
         <div className="wl-history-empty">No entries yet — log the first one above!</div>
       ) : (
         <table className="wl-hist-table">
-          <colgroup>
-            <col className="col-date" />
-            {CATS.map((c) => <col key={c.id} className="col-cat" />)}
-          </colgroup>
           <thead>
             <tr>
-              <th>Date</th>
-              {CATS.map((c) => <th key={c.id}>{c.name}</th>)}
+              <th style={{ width: '45%', textAlign: 'left' }}>Date</th>
+              {CATS.map((c) => <th key={c.id} style={{ width: '18.33%' }}>{c.name}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -642,12 +630,8 @@ function MultiCareSheet({ type, catState, onLog, onDelete, onClearAll, saving })
               <span className="wl-clear-confirm-text">
                 Remove all {totalEntries} entries?
               </span>
-              <button className="wl-clear-yes" onClick={handleClearConfirm}>
-                Yes, clear
-              </button>
-              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>
-                Cancel
-              </button>
+              <button className="wl-clear-yes" onClick={handleClearConfirm}>Yes, clear</button>
+              <button className="wl-clear-no"  onClick={() => setConfirmClear(false)}>Cancel</button>
             </div>
           ) : (
             <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>
@@ -698,9 +682,9 @@ function CatsSection({ catId, data, onOpenSheet }) {
       <CareCard type="nails" entries={data?.nails ?? []} onTap={() => onOpenSheet('nails')} />
 
       {[
-        { icon: '🏥', label: 'Vet Visits',     sub: 'Checkups & vaccines'  },
-        { icon: '⚖️', label: 'Weight',         sub: 'Track over time'       },
-        { icon: '📝', label: 'Health Journal', sub: 'Notes & observations'  },
+        { icon: '🏥', label: 'Vet Visits',     sub: 'Checkups & vaccines' },
+        { icon: '⚖️', label: 'Weight',         sub: 'Track over time'      },
+        { icon: '📝', label: 'Health Journal', sub: 'Notes & observations' },
       ].map(({ icon, label, sub }) => (
         <div key={label} className="wl-placeholder-section">
           <div className="wl-placeholder-icon">{icon}</div>
@@ -744,7 +728,7 @@ function App() {
     ollie:  { status: 'idle', data: null },
   });
 
-  // ── Always-fresh ref so callbacks never close over stale catState ──────────
+  // Always-fresh ref — callbacks read this instead of closing over catState
   const catStateRef = useRef(catState);
   useEffect(() => { catStateRef.current = catState; });
 
@@ -764,9 +748,9 @@ function App() {
     CATS.forEach((cat) => loadCat(cat.id));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Log one date for one or more cats ─────────────────────────────────────
+  // Log one date for one or more cats
   const handleMultiLog = useCallback(async (type, date, catIds) => {
-    const cs = catStateRef.current;                          // always fresh
+    const cs = catStateRef.current;
     const updates = catIds
       .map((id) => {
         const data = cs[id]?.data;
@@ -790,11 +774,11 @@ function App() {
     } finally {
       setSaving(false);
     }
-  }, []); // stable — reads via ref
+  }, []);
 
-  // ── Delete one cat's entry for a given date ───────────────────────────────
+  // Delete one cat's entry for a given date
   const handleDelete = useCallback(async (type, date, catId) => {
-    const data = catStateRef.current[catId]?.data;           // always fresh
+    const data = catStateRef.current[catId]?.data;
     if (!data) return;
     const updated = { ...data, [type]: (data[type] || []).filter((e) => e.date !== date) };
 
@@ -807,11 +791,11 @@ function App() {
     } finally {
       setSaving(false);
     }
-  }, []); // stable — reads via ref
+  }, []);
 
-  // ── Clear all entries for a given type across all cats ────────────────────
+  // Clear all entries for a given type across all cats
   const handleClearAll = useCallback(async (type) => {
-    const cs = catStateRef.current;                          // always fresh
+    const cs = catStateRef.current;
     const updates = CATS
       .map((cat) => {
         const data = cs[cat.id]?.data;
@@ -835,7 +819,7 @@ function App() {
     } finally {
       setSaving(false);
     }
-  }, []); // stable — reads via ref
+  }, []);
 
   const { status, data } = catState[activeCatId];
   const catDataMap = Object.fromEntries(CATS.map((c) => [c.id, catState[c.id].data]));
