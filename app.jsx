@@ -22,7 +22,6 @@ const emptyCatData = (id) => ({
   journal: [],
 });
 
-// ─── Care config (flea + nails) ───────────────────────────────────────────────
 const CARE_CONFIG = {
   flea: {
     label:     'Flea Medicine',
@@ -41,21 +40,13 @@ const CARE_CONFIG = {
 };
 
 const VET_VISIT_TYPES = [
-  'Annual Checkup',
-  'Vaccine',
-  'Teeth Cleaning',
-  'Sick Visit',
-  'Follow-up',
-  'Other',
+  'Annual Checkup', 'Vaccine', 'Teeth Cleaning', 'Sick Visit', 'Follow-up', 'Other',
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function todayISO() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
 function formatDate(iso) {
@@ -78,23 +69,21 @@ function daysLabel(days) {
   return `${days}d ago`;
 }
 
-// More readable labels for vet history (weeks/months/years)
 function longDaysLabel(days) {
   if (days === null) return '';
   if (days === 0)    return 'today';
   if (days === 1)    return 'yesterday';
   if (days < 7)     return `${days} days ago`;
-  if (days < 30)    { const w = Math.floor(days / 7);  return `${w} week${w > 1 ? 's' : ''} ago`; }
-  if (days < 365)   { const mo = Math.floor(days / 30); return `${mo} month${mo > 1 ? 's' : ''} ago`; }
-  const yr = Math.floor(days / 365);
-  const mo = Math.floor((days % 365) / 30);
-  return mo > 0 ? `${yr}y ${mo}mo ago` : `${yr} year${yr > 1 ? 's' : ''} ago`;
+  if (days < 30)    { const w = Math.floor(days/7);  return `${w} week${w>1?'s':''} ago`; }
+  if (days < 365)   { const m = Math.floor(days/30); return `${m} month${m>1?'s':''} ago`; }
+  const yr = Math.floor(days/365);
+  const mo = Math.floor((days%365)/30);
+  return mo > 0 ? `${yr}y ${mo}mo ago` : `${yr} year${yr>1?'s':''} ago`;
 }
 
 function getStatus(entries, greenDays, amberDays) {
-  if (!entries || entries.length === 0) {
+  if (!entries || entries.length === 0)
     return { color: 'red', label: 'Never logged', lastDate: null, days: null };
-  }
   const lastDate = [...entries].sort((a, b) => b.date.localeCompare(a.date))[0].date;
   const days = getDaysSince(lastDate);
   if (days < greenDays) return { color: 'green', label: 'On schedule', lastDate, days };
@@ -102,35 +91,19 @@ function getStatus(entries, greenDays, amberDays) {
   return                       { color: 'red',   label: 'Overdue',     lastDate, days };
 }
 
-// Checks last Annual Checkup and last Vaccine independently.
-// Flags red if either > 12 months or never logged.
-// Flags amber if either is 10–12 months.
 function getVetStatus(vetEntries) {
   const entries = vetEntries || [];
-  const last = (type) => entries
-    .filter((e) => e.type === type)
+  const last = (type) => entries.filter(e => e.type === type)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
-
   const lastCheckup = last('Annual Checkup');
   const lastVaccine = last('Vaccine');
   const checkupDays = lastCheckup ? getDaysSince(lastCheckup.date) : null;
   const vaccineDays = lastVaccine ? getDaysSince(lastVaccine.date) : null;
-
-  const redItems = [];
-  const amberItems = [];
-
-  if (checkupDays === null || checkupDays > 365) {
-    redItems.push({ label: 'Annual Checkup', days: checkupDays });
-  } else if (checkupDays > 304) {
-    amberItems.push({ label: 'Annual Checkup', days: checkupDays });
-  }
-
-  if (vaccineDays === null || vaccineDays > 365) {
-    redItems.push({ label: 'Vaccine', days: vaccineDays });
-  } else if (vaccineDays > 304) {
-    amberItems.push({ label: 'Vaccine', days: vaccineDays });
-  }
-
+  const redItems = [], amberItems = [];
+  if (checkupDays === null || checkupDays > 365) redItems.push({ label: 'Annual Checkup', days: checkupDays });
+  else if (checkupDays > 304) amberItems.push({ label: 'Annual Checkup', days: checkupDays });
+  if (vaccineDays === null || vaccineDays > 365) redItems.push({ label: 'Vaccine', days: vaccineDays });
+  else if (vaccineDays > 304) amberItems.push({ label: 'Vaccine', days: vaccineDays });
   if (redItems.length > 0)   return { color: 'red',   label: 'Overdue',    flagged: redItems };
   if (amberItems.length > 0) return { color: 'amber', label: 'Due soon',   flagged: amberItems };
   return                            { color: 'green', label: 'Up to date', flagged: [] };
@@ -162,12 +135,9 @@ const styles = `
 
   body {
     font-family: 'Nunito', sans-serif;
-    background: #FDF8F0;
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    color: #2D1506;
-    font-size: 16px;
+    background: #FDF8F0; min-height: 100vh;
+    max-width: 480px; margin: 0 auto;
+    color: #2D1506; font-size: 16px;
   }
   button { font-family: inherit; cursor: pointer; }
   input, textarea, select { font-family: inherit; }
@@ -193,9 +163,8 @@ const styles = `
   }
   .wl-cat-card {
     background: white; border: 2.5px solid #EDD9C5;
-    border-radius: 14px; padding: 10px 6px;
-    text-align: center; transition: all .12s;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border-radius: 14px; padding: 10px 6px; text-align: center;
+    transition: all .12s; display: flex; flex-direction: column; align-items: center; gap: 4px;
     cursor: pointer;
   }
   .wl-cat-card.active {
@@ -269,7 +238,7 @@ const styles = `
     border-radius: 20px; padding: 4px 10px;
     font-size: 11px; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
   }
-  .wl-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .wl-status-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .wl-status-green { background: #EDFAF1; color: #186F3C; }
   .wl-status-green .wl-status-dot { background: #2AB25B; }
   .wl-status-amber { background: #FFF8E6; color: #8C6200; }
@@ -288,15 +257,14 @@ const styles = `
   .wl-placeholder-label { font-size: 15px; font-weight: 700; color: #3D2010; }
   .wl-placeholder-sub   { font-size: 13px; color: #6B4E38; margin-top: 2px; }
   .wl-coming-badge {
-    margin-left: auto; flex-shrink: 0;
-    background: #FFF5EE; border: 1px solid #EDD9C5;
+    margin-left: auto; flex-shrink: 0; background: #FFF5EE; border: 1px solid #EDD9C5;
     border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 700; color: #C96A3A;
   }
 
   /* ── BOTTOM SHEET ── */
   .wl-sheet-backdrop {
     position: fixed; inset: 0; z-index: 40;
-    background: rgba(45, 21, 6, 0.45);
+    background: rgba(45,21,6,.45);
     display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
   }
   .wl-sheet {
@@ -304,7 +272,7 @@ const styles = `
     width: 100%; max-width: 480px; max-height: 78vh;
     display: flex; flex-direction: column;
     box-shadow: 0 -4px 28px rgba(45,21,6,.18);
-    animation: wl-sheet-up .22s cubic-bezier(0.34, 1.2, 0.64, 1);
+    animation: wl-sheet-up .22s cubic-bezier(0.34,1.2,0.64,1);
   }
   @keyframes wl-sheet-up {
     from { transform: translateY(80px); opacity: 0; }
@@ -341,7 +309,7 @@ const styles = `
   }
   .wl-date-input:focus { border-color: #C96A3A; box-shadow: 0 0 0 3px rgba(201,106,58,.12); }
 
-  /* ── SELECT DROPDOWN ── */
+  /* ── SELECT ── */
   .wl-select-wrapper { position: relative; margin-bottom: 14px; }
   .wl-select-wrapper::after {
     content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
@@ -350,22 +318,20 @@ const styles = `
   .wl-select-input {
     width: 100%; appearance: none; -webkit-appearance: none;
     border: 1.5px solid #EDD9C5; border-radius: 12px;
-    padding: 11px 36px 11px 12px; font-size: 15px; color: #2D1506;
-    background: #FFFBF7; outline: none;
+    padding: 11px 36px 11px 12px; font-size: 15px; color: #2D1506; background: #FFFBF7; outline: none;
   }
   .wl-select-input:focus { border-color: #C96A3A; box-shadow: 0 0 0 3px rgba(201,106,58,.12); }
 
-  /* ── NOTES TEXTAREA (auto-expand) ── */
+  /* ── NOTES TEXTAREA ── */
   .wl-notes-input {
     width: 100%; border: 1.5px solid #EDD9C5; border-radius: 12px;
     padding: 11px 12px; font-size: 15px; color: #2D1506; line-height: 1.55;
-    background: #FFFBF7; outline: none; resize: none; overflow: hidden;
-    min-height: 80px; margin-bottom: 0;
+    background: #FFFBF7; outline: none; resize: none; overflow: hidden; min-height: 80px;
   }
   .wl-notes-input:focus { border-color: #C96A3A; box-shadow: 0 0 0 3px rgba(201,106,58,.12); }
   .wl-notes-input::placeholder { color: #BBA090; }
 
-  /* ── CAT TOGGLE BUTTONS ── */
+  /* ── CAT / SOURCE TOGGLES ── */
   .wl-cat-toggles { display: flex; gap: 8px; }
   .wl-cat-toggle {
     flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -387,7 +353,7 @@ const styles = `
   .wl-log-feedback { margin-top: 8px; font-size: 12px; color: #9E8070; min-height: 18px; }
   .wl-log-feedback.error { color: #B03020; }
 
-  /* ── FLEA/NAILS HISTORY TABLE ── */
+  /* ── FLEA / NAILS HISTORY TABLE ── */
   .wl-history-empty { font-size: 14px; color: #BBA090; padding: 10px 0; font-style: italic; }
   .wl-hist-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .wl-hist-table thead th {
@@ -406,15 +372,12 @@ const styles = `
     transition: background .12s; display: inline-block;
   }
   .wl-hist-check-btn:active { background: #EDFAF1; }
-  .wl-hist-dash {
-    display: block; text-align: center; color: #DDD3CB;
-    font-size: 14px; padding: 8px 0; line-height: 1; user-select: none;
-  }
+  .wl-hist-dash { display: block; text-align: center; color: #DDD3CB; font-size: 14px; padding: 8px 0; line-height: 1; }
 
   /* ── VET OVERDUE BANNER ── */
   .wl-vet-overdue {
-    background: #FFF8E6; border: 1px solid #F0D488;
-    border-radius: 12px; padding: 10px 14px; margin-bottom: 18px;
+    background: #FFF8E6; border: 1px solid #F0D488; border-radius: 12px;
+    padding: 10px 14px; margin-bottom: 18px;
     display: flex; flex-direction: column; gap: 5px;
   }
   .wl-vet-overdue-item { font-size: 13px; color: #7A5500; font-weight: 600; display: flex; gap: 7px; }
@@ -422,12 +385,9 @@ const styles = `
   /* ── VET HISTORY CARDS ── */
   .wl-vet-card {
     background: #FDF8F0; border-radius: 12px;
-    border: 1px solid rgba(220,170,130,.25);
-    padding: 12px 14px; margin-bottom: 8px;
+    border: 1px solid rgba(220,170,130,.25); padding: 12px 14px; margin-bottom: 8px;
   }
-  .wl-vet-card-header {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
-  }
+  .wl-vet-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .wl-vet-card-date  { font-size: 14px; font-weight: 700; color: #3D2010; }
   .wl-vet-card-ago   { font-size: 11px; color: #9E8070; margin-top: 2px; }
   .wl-vet-card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -442,13 +402,9 @@ const styles = `
     white-space: nowrap; transition: color .12s;
   }
   .wl-vet-delete-btn:active { color: #D94030; }
-  .wl-vet-card-notes {
-    font-size: 13px; color: #5C3D28; margin-top: 9px;
-    line-height: 1.55; white-space: pre-wrap;
-  }
+  .wl-vet-card-notes { font-size: 13px; color: #5C3D28; margin-top: 9px; line-height: 1.55; white-space: pre-wrap; }
   .wl-vet-confirm-row {
-    margin-top: 10px; padding-top: 10px;
-    border-top: 1px solid rgba(220,170,130,.2);
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(220,170,130,.2);
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
   }
   .wl-vet-confirm-text { font-size: 13px; color: #6B4E38; font-weight: 600; }
@@ -462,10 +418,50 @@ const styles = `
     border-radius: 10px; padding: 6px 14px; font-size: 12px; font-weight: 700;
   }
 
-  /* ── CLEAR ALL HISTORY ── */
+  /* ── WEIGHT CHART ── */
+  .wl-chart-wrap {
+    background: white; border-radius: 14px; padding: 8px 6px 6px;
+    border: 1px solid rgba(220,170,130,.2); margin-bottom: 20px;
+    user-select: none;
+  }
+  .wl-chart-empty {
+    font-size: 14px; color: #BBA090; font-style: italic;
+    padding: 28px 0; text-align: center;
+  }
+
+  /* ── WEIGHT INPUT ── */
+  .wl-weight-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .wl-lbs-input {
+    flex: 1; border: 1.5px solid #EDD9C5; border-radius: 12px;
+    padding: 11px 12px; font-size: 22px; font-weight: 800; color: #2D1506;
+    background: #FFFBF7; outline: none; text-align: center; -webkit-appearance: none;
+  }
+  .wl-lbs-input:focus { border-color: #C96A3A; box-shadow: 0 0 0 3px rgba(201,106,58,.12); }
+  .wl-lbs-unit { font-size: 16px; font-weight: 700; color: #9E8070; flex-shrink: 0; }
+
+  /* ── WEIGHT HISTORY TABLE ── */
+  .wl-weight-table { width: 100%; border-collapse: collapse; }
+  .wl-weight-table thead th {
+    font-size: 11px; font-weight: 800; color: #9E8070;
+    letter-spacing: .07em; text-transform: uppercase; padding-bottom: 8px; text-align: left;
+  }
+  .wl-weight-table thead th:nth-child(2),
+  .wl-weight-table thead th:nth-child(3) { text-align: center; }
+  .wl-weight-table tbody tr { border-top: 1px solid rgba(220,170,130,.15); }
+  .wl-wt-date { font-size: 13px; color: #3D2010; padding: 8px 0; }
+  .wl-wt-lbs  { font-size: 14px; font-weight: 800; color: #C96A3A; text-align: center; padding: 8px 4px; }
+  .wl-wt-src  { font-size: 12px; color: #9E8070; text-align: center; padding: 8px 4px; }
+  .wl-wt-del  { text-align: right; padding: 8px 0 8px 4px; }
+  .wl-wt-del-btn {
+    background: none; border: none; color: #C0A898;
+    font-size: 18px; line-height: 1; padding: 2px 4px;
+    cursor: pointer; border-radius: 6px; transition: color .12s;
+  }
+  .wl-wt-del-btn:active { color: #D94030; }
+
+  /* ── CLEAR ALL ── */
   .wl-clear-section {
-    margin-top: 28px; padding-top: 18px;
-    border-top: 1px solid rgba(220,170,130,.2);
+    margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(220,170,130,.2);
     display: flex; flex-direction: column; align-items: center; gap: 12px;
   }
   .wl-clear-btn {
@@ -473,9 +469,7 @@ const styles = `
     font-size: 13px; font-weight: 700; color: #B0A090; transition: all .12s;
   }
   .wl-clear-btn:active { border-color: #D94030; color: #D94030; }
-  .wl-clear-confirm {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
-  }
+  .wl-clear-confirm { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
   .wl-clear-confirm-text { font-size: 13px; color: #6B4E38; font-weight: 600; }
   .wl-clear-yes {
     background: #D94030; color: white; border: none;
@@ -529,8 +523,7 @@ function CatAvatar({ photo, size = 52, fontSize = 26 }) {
 function StatusBadge({ color, label }) {
   return (
     <span className={`wl-status-badge wl-status-${color}`}>
-      <span className="wl-status-dot" />
-      {label}
+      <span className="wl-status-dot" />{label}
     </span>
   );
 }
@@ -564,16 +557,13 @@ function VetCareCard({ entries, onTap }) {
   const sorted = [...(entries || [])].sort((a, b) => b.date.localeCompare(a.date));
   const last   = sorted[0];
   const status = getVetStatus(entries);
-
   let lastText;
-  if (!last) {
-    lastText = 'No visits logged — tap to add';
-  } else {
+  if (!last) lastText = 'No visits logged — tap to add';
+  else {
     const days = getDaysSince(last.date);
     const ago  = days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days}d ago`;
     lastText = `Last: ${formatDate(last.date)} · ${last.type} · ${ago}`;
   }
-
   return (
     <div className="wl-care-card" onClick={onTap}>
       <div className="wl-care-icon">🏥</div>
@@ -589,6 +579,181 @@ function VetCareCard({ entries, onTap }) {
   );
 }
 
+// ─── WeightCareCard ───────────────────────────────────────────────────────────
+function WeightCareCard({ entries, onTap }) {
+  const sorted = [...(entries || [])].sort((a, b) => b.date.localeCompare(a.date));
+  const last   = sorted[0];
+  const lastText = last
+    ? `${last.lbs} lbs · ${formatDate(last.date)}`
+    : 'No weight logged — tap to add';
+  return (
+    <div className="wl-care-card" onClick={onTap}>
+      <div className="wl-care-icon">⚖️</div>
+      <div className="wl-care-body">
+        <div className="wl-care-label">Weight</div>
+        <div className="wl-care-last">{lastText}</div>
+      </div>
+      <div className="wl-care-right">
+        <div className="wl-care-chevron">›</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── WeightChart ──────────────────────────────────────────────────────────────
+// SVG line chart. Tap a dot to see date + weight tooltip; tap again or tap
+// anywhere else to dismiss.
+function WeightChart({ entries }) {
+  const [tooltip, setTooltip] = useState(null); // { date, lbs, src } | null
+
+  if (!entries || entries.length === 0) {
+    return <div className="wl-chart-empty">No weight data yet — log the first entry below.</div>;
+  }
+
+  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+
+  // Chart geometry
+  const W = 340, H = 140;
+  const PAD = { l: 36, r: 10, t: 16, b: 28 };
+  const pw = W - PAD.l - PAD.r;  // 294
+  const ph = H - PAD.t - PAD.b;  // 96
+
+  // X scale — time
+  const toMs  = (iso) => new Date(iso + 'T12:00:00').getTime();
+  const tsArr = sorted.map(e => toMs(e.date));
+  const minTs = tsArr[0];
+  const maxTs = tsArr[tsArr.length - 1];
+  const tsSpan = maxTs - minTs || 1;
+  const xOf = (iso) => sorted.length === 1
+    ? PAD.l + pw / 2
+    : PAD.l + ((toMs(iso) - minTs) / tsSpan) * pw;
+
+  // Y scale — weight, padded 20% above and below data range
+  const lbsArr = sorted.map(e => parseFloat(e.lbs));
+  const dMin   = Math.min(...lbsArr);
+  const dMax   = Math.max(...lbsArr);
+  const pad    = (dMax - dMin || 1) * 0.2;
+  const yMin   = dMin - pad;
+  const yMax   = dMax + pad;
+  const yOf    = (lbs) => PAD.t + ph - ((lbs - yMin) / (yMax - yMin)) * ph;
+
+  // Y grid labels (4 evenly spaced)
+  const yLabels = Array.from({ length: 4 }, (_, i) => +(yMin + (yMax - yMin) * (i / 3)).toFixed(1));
+
+  // X axis labels: first, middle, last (up to 3)
+  const spanDays = (maxTs - minTs) / 86400000;
+  const xFmt = (iso) => {
+    const [y, m, d] = iso.split('-').map(Number);
+    const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1];
+    return spanDays > 180 ? `${mn} '${String(y).slice(2)}` : `${mn} ${d}`;
+  };
+  const xLabelIdxs = sorted.length === 1 ? [0]
+    : sorted.length === 2 ? [0, 1]
+    : [0, Math.floor((sorted.length - 1) / 2), sorted.length - 1];
+
+  // SVG polyline points
+  const ptStr = sorted.map(e => `${xOf(e.date).toFixed(1)},${yOf(e.lbs).toFixed(1)}`).join(' ');
+
+  // Tooltip geometry
+  const TW = 114, TH = 44;
+
+  function handleDot(e, entry) {
+    e.stopPropagation();
+    setTooltip(prev => prev?.date === entry.date ? null : entry);
+  }
+
+  const tip = tooltip;
+  let tipX = 0, tipY = 0;
+  if (tip) {
+    tipX = Math.max(TW / 2 + 2, Math.min(W - TW / 2 - 2, xOf(tip.date)));
+    const dotY = yOf(tip.lbs);
+    tipY = dotY > TH + 20 ? dotY - TH - 12 : dotY + 14;
+  }
+
+  return (
+    <div className="wl-chart-wrap">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        style={{ width: '100%', height: 'auto', display: 'block' }}
+        onClick={() => setTooltip(null)}
+      >
+        {/* Transparent background to capture taps */}
+        <rect x={0} y={0} width={W} height={H} fill="transparent" />
+
+        {/* Y grid lines + labels */}
+        {yLabels.map((v, i) => (
+          <g key={i}>
+            <line
+              x1={PAD.l} y1={yOf(v)} x2={W - PAD.r} y2={yOf(v)}
+              stroke="#EDD9C5" strokeWidth="1" strokeDasharray="3,3"
+            />
+            <text
+              x={PAD.l - 5} y={yOf(v) + 4}
+              textAnchor="end" fontSize="9" fill="#B0A090" fontFamily="Nunito, sans-serif"
+            >{v}</text>
+          </g>
+        ))}
+
+        {/* X axis labels */}
+        {xLabelIdxs.map(idx => (
+          <text key={idx}
+            x={xOf(sorted[idx].date)} y={H - PAD.b + 14}
+            textAnchor="middle" fontSize="9" fill="#B0A090" fontFamily="Nunito, sans-serif"
+          >{xFmt(sorted[idx].date)}</text>
+        ))}
+
+        {/* Data line */}
+        {sorted.length > 1 && (
+          <polyline
+            points={ptStr}
+            fill="none" stroke="#C96A3A" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round"
+          />
+        )}
+
+        {/* Data dots */}
+        {sorted.map((entry, i) => {
+          const cx = xOf(entry.date);
+          const cy = yOf(entry.lbs);
+          const sel = tip?.date === entry.date;
+          return (
+            <g key={i} onClick={(e) => handleDot(e, entry)} style={{ cursor: 'pointer' }}>
+              {/* Invisible larger tap target */}
+              <circle cx={cx} cy={cy} r={14} fill="transparent" />
+              <circle
+                cx={cx} cy={cy} r={sel ? 6 : 4}
+                fill={sel ? '#8C3E1A' : '#C96A3A'}
+                stroke="white" strokeWidth={sel ? 2.5 : 2}
+              />
+            </g>
+          );
+        })}
+
+        {/* Tooltip */}
+        {tip && (
+          <g style={{ pointerEvents: 'none' }}>
+            <rect
+              x={tipX - TW / 2} y={tipY}
+              width={TW} height={TH} rx={8}
+              fill="white" stroke="#EDD9C5" strokeWidth="1.5"
+            />
+            <text
+              x={tipX} y={tipY + 16}
+              textAnchor="middle" fontSize="10" fill="#6B4E38"
+              fontFamily="Nunito, sans-serif" fontWeight="600"
+            >{formatDate(tip.date)}</text>
+            <text
+              x={tipX} y={tipY + 33}
+              textAnchor="middle" fontSize="13" fill="#C96A3A"
+              fontFamily="Nunito, sans-serif" fontWeight="800"
+            >{tip.lbs} lbs · {tip.src}</text>
+          </g>
+        )}
+      </svg>
+    </div>
+  );
+}
+
 // ─── BottomSheet ──────────────────────────────────────────────────────────────
 function BottomSheet({ title, onClose, children }) {
   useEffect(() => {
@@ -597,7 +762,7 @@ function BottomSheet({ title, onClose, children }) {
   }, []);
   return (
     <div className="wl-sheet-backdrop" onClick={onClose}>
-      <div className="wl-sheet" onClick={(e) => e.stopPropagation()}>
+      <div className="wl-sheet" onClick={e => e.stopPropagation()}>
         <div className="wl-sheet-handle-wrap"><div className="wl-sheet-handle" /></div>
         <div className="wl-sheet-header">
           <div className="wl-sheet-title">{title}</div>
@@ -618,27 +783,25 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
   const [confirmClear, setConfirmClear] = useState(false);
 
   function toggleCat(id) {
-    setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
     setFeedback('');
   }
 
   function handleLog() {
     if (!dateVal || selected.length === 0) return;
-    const alreadyLogged = selected.filter((id) =>
-      (catState[id]?.data?.[type] || []).some((e) => e.date === dateVal)
+    const alreadyLogged = selected.filter(id =>
+      (catState[id]?.data?.[type] || []).some(e => e.date === dateVal)
     );
-    const toLog = selected.filter((id) => !alreadyLogged.includes(id));
+    const toLog = selected.filter(id => !alreadyLogged.includes(id));
     if (toLog.length === 0) {
-      const names = alreadyLogged.map((id) => CATS.find((c) => c.id === id).name).join(', ');
+      const names = alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ');
       setFeedback(`Already logged for ${names} on this date.`);
       return;
     }
     if (alreadyLogged.length > 0) {
-      const names = alreadyLogged.map((id) => CATS.find((c) => c.id === id).name).join(', ');
+      const names = alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ');
       setFeedback(`Skipped ${names} — already logged for this date.`);
-    } else {
-      setFeedback('');
-    }
+    } else { setFeedback(''); }
     onLog(type, dateVal, toLog);
   }
 
@@ -659,10 +822,10 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
       <div className="wl-log-section">
         <div className="wl-section-label">Date</div>
         <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
-          onChange={(e) => { setDateVal(e.target.value); setFeedback(''); }} />
+          onChange={e => { setDateVal(e.target.value); setFeedback(''); }} />
         <div className="wl-section-label">Apply to</div>
         <div className="wl-cat-toggles">
-          {CATS.map((cat) => {
+          {CATS.map(cat => {
             const on     = selected.includes(cat.id);
             const loaded = catState[cat.id]?.status === 'loaded';
             return (
@@ -691,35 +854,29 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
         <table className="wl-hist-table">
           <thead>
             <tr>
-              <th style={{ width: '45%', textAlign: 'left' }}>Date</th>
-              {CATS.map((c) => <th key={c.id} style={{ width: '18.33%' }}>{c.name}</th>)}
+              <th style={{ width:'45%', textAlign:'left' }}>Date</th>
+              {CATS.map(c => <th key={c.id} style={{ width:'18.33%' }}>{c.name}</th>)}
             </tr>
           </thead>
           <tbody>
-            {grouped.map(({ date, catIds }) => {
-              const days = getDaysSince(date);
-              return (
-                <tr key={date}>
-                  <td className="wl-hist-date-cell">
-                    <div className="wl-hist-date-main">{formatDate(date)}</div>
-                    <div className="wl-hist-date-sub">{daysLabel(days)}</div>
+            {grouped.map(({ date, catIds }) => (
+              <tr key={date}>
+                <td className="wl-hist-date-cell">
+                  <div className="wl-hist-date-main">{formatDate(date)}</div>
+                  <div className="wl-hist-date-sub">{daysLabel(getDaysSince(date))}</div>
+                </td>
+                {CATS.map(cat => catIds.has(cat.id) ? (
+                  <td key={cat.id} className="wl-hist-cat-cell">
+                    <button className="wl-hist-check-btn"
+                      onClick={() => onDelete(type, date, cat.id)}>✓</button>
                   </td>
-                  {CATS.map((cat) =>
-                    catIds.has(cat.id) ? (
-                      <td key={cat.id} className="wl-hist-cat-cell">
-                        <button className="wl-hist-check-btn"
-                          onClick={() => onDelete(type, date, cat.id)}
-                          title={`Remove ${cat.name} on ${formatDate(date)}`}>✓</button>
-                      </td>
-                    ) : (
-                      <td key={cat.id} className="wl-hist-cat-cell">
-                        <span className="wl-hist-dash">—</span>
-                      </td>
-                    )
-                  )}
-                </tr>
-              );
-            })}
+                ) : (
+                  <td key={cat.id} className="wl-hist-cat-cell">
+                    <span className="wl-hist-dash">—</span>
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
@@ -729,8 +886,9 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
           {confirmClear ? (
             <div className="wl-clear-confirm">
               <span className="wl-clear-confirm-text">Remove all {totalEntries} entries?</span>
-              <button className="wl-clear-yes" onClick={() => { onClearAll(type); setConfirmClear(false); }}>Yes, clear</button>
-              <button className="wl-clear-no"  onClick={() => setConfirmClear(false)}>Cancel</button>
+              <button className="wl-clear-yes"
+                onClick={() => { onClearAll(type); setConfirmClear(false); }}>Yes, clear</button>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
             </div>
           ) : (
             <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>Clear all history</button>
@@ -742,19 +900,16 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
 }
 
 // ─── VetSheet ─────────────────────────────────────────────────────────────────
-function VetSheet({ catId, catData, onAdd, onDelete, onClearAll, saving }) {
+function VetSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
   const entries = catData?.vet || [];
   const status  = getVetStatus(entries);
-
-  const [dateVal,        setDateVal]        = useState(todayISO());
-  const [visitType,      setVisitType]      = useState('Annual Checkup');
-  const [notes,          setNotes]          = useState('');
-  const [confirmDelete,  setConfirmDelete]  = useState(null); // entry id | null
-  const [confirmClear,   setConfirmClear]   = useState(false);
-
+  const [dateVal,       setDateVal]       = useState(todayISO());
+  const [visitType,     setVisitType]     = useState('Annual Checkup');
+  const [notes,         setNotes]         = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [confirmClear,  setConfirmClear]  = useState(false);
   const notesRef = useRef(null);
 
-  // Auto-expand textarea as user types
   useEffect(() => {
     if (notesRef.current) {
       notesRef.current.style.height = 'auto';
@@ -764,64 +919,42 @@ function VetSheet({ catId, catData, onAdd, onDelete, onClearAll, saving }) {
 
   function handleLog() {
     if (!dateVal) return;
-    onAdd({
-      id:    Date.now().toString(),
-      date:  dateVal,
-      type:  visitType,
-      notes: notes.trim(),
-    });
-    // Reset form
-    setDateVal(todayISO());
-    setVisitType('Annual Checkup');
-    setNotes('');
+    onAdd({ id: Date.now().toString(), date: dateVal, type: visitType, notes: notes.trim() });
+    setDateVal(todayISO()); setVisitType('Annual Checkup'); setNotes('');
   }
 
   const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <>
-      {/* ── Overdue banner ── */}
       {status.flagged.length > 0 && (
         <div className="wl-vet-overdue">
-          {status.flagged.map((item) => (
+          {status.flagged.map(item => (
             <div key={item.label} className="wl-vet-overdue-item">
               <span>⚠️</span>
-              <span>
-                {item.label}: {item.days === null
-                  ? 'never logged'
-                  : `${Math.floor(item.days / 30)} months ago — ${status.color === 'amber' ? 'due soon' : 'overdue'}`}
+              <span>{item.label}: {item.days === null
+                ? 'never logged'
+                : `${Math.floor(item.days/30)} months ago — ${status.color === 'amber' ? 'due soon' : 'overdue'}`}
               </span>
             </div>
           ))}
         </div>
       )}
 
-      {/* ── Log form ── */}
       <div className="wl-log-section">
         <div className="wl-section-label">Date</div>
         <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
-          onChange={(e) => setDateVal(e.target.value)} />
-
+          onChange={e => setDateVal(e.target.value)} />
         <div className="wl-section-label">Visit Type</div>
         <div className="wl-select-wrapper">
-          <select className="wl-select-input" value={visitType}
-            onChange={(e) => setVisitType(e.target.value)}>
-            {VET_VISIT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          <select className="wl-select-input" value={visitType} onChange={e => setVisitType(e.target.value)}>
+            {VET_VISIT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
-
-        <div className="wl-section-label">
-          Notes <span className="wl-optional">(optional)</span>
-        </div>
-        <textarea
-          ref={notesRef}
-          className="wl-notes-input"
-          value={notes}
-          rows={3}
+        <div className="wl-section-label">Notes <span className="wl-optional">(optional)</span></div>
+        <textarea ref={notesRef} className="wl-notes-input" value={notes} rows={3}
           placeholder="Weight, observations, follow-up reminders…"
-          onChange={(e) => setNotes(e.target.value)}
-        />
-
+          onChange={e => setNotes(e.target.value)} />
         <div className="wl-log-row-end">
           <button className="wl-log-btn" onClick={handleLog} disabled={!dateVal || saving}>
             {saving ? '…' : 'Log Visit'}
@@ -830,68 +963,154 @@ function VetSheet({ catId, catData, onAdd, onDelete, onClearAll, saving }) {
         {saving && <div className="wl-log-feedback">Saving…</div>}
       </div>
 
-      {/* ── History ── */}
       <div className="wl-section-label">History ({sorted.length} visit{sorted.length !== 1 ? 's' : ''})</div>
-
       {sorted.length === 0 ? (
         <div className="wl-history-empty">No visits logged yet — add the first one above!</div>
-      ) : (
-        sorted.map((entry) => {
-          const days         = getDaysSince(entry.date);
-          const isConfirming = confirmDelete === entry.id;
-          return (
-            <div key={entry.id ?? entry.date} className="wl-vet-card">
-              <div className="wl-vet-card-header">
-                <div>
-                  <div className="wl-vet-card-date">{formatDate(entry.date)}</div>
-                  <div className="wl-vet-card-ago">{longDaysLabel(days)}</div>
-                </div>
-                <div className="wl-vet-card-right">
-                  <span className="wl-vet-type-badge">{entry.type}</span>
-                  {!isConfirming && (
-                    <button className="wl-vet-delete-btn"
-                      onClick={() => setConfirmDelete(entry.id)}>
-                      Delete
-                    </button>
-                  )}
+      ) : sorted.map(entry => {
+        const isConfirming = confirmDelete === entry.id;
+        return (
+          <div key={entry.id ?? entry.date} className="wl-vet-card">
+            <div className="wl-vet-card-header">
+              <div>
+                <div className="wl-vet-card-date">{formatDate(entry.date)}</div>
+                <div className="wl-vet-card-ago">{longDaysLabel(getDaysSince(entry.date))}</div>
+              </div>
+              <div className="wl-vet-card-right">
+                <span className="wl-vet-type-badge">{entry.type}</span>
+                {!isConfirming && (
+                  <button className="wl-vet-delete-btn" onClick={() => setConfirmDelete(entry.id)}>Delete</button>
+                )}
+              </div>
+            </div>
+            {entry.notes && <div className="wl-vet-card-notes">{entry.notes}</div>}
+            {isConfirming && (
+              <div className="wl-vet-confirm-row">
+                <span className="wl-vet-confirm-text">Remove this visit?</span>
+                <div className="wl-vet-confirm-btns">
+                  <button className="wl-vet-confirm-no" onClick={() => setConfirmDelete(null)}>Cancel</button>
+                  <button className="wl-vet-confirm-yes"
+                    onClick={() => { onDelete(entry.id); setConfirmDelete(null); }}>Delete</button>
                 </div>
               </div>
-              {entry.notes && (
-                <div className="wl-vet-card-notes">{entry.notes}</div>
-              )}
-              {isConfirming && (
-                <div className="wl-vet-confirm-row">
-                  <span className="wl-vet-confirm-text">Remove this visit?</span>
-                  <div className="wl-vet-confirm-btns">
-                    <button className="wl-vet-confirm-no"
-                      onClick={() => setConfirmDelete(null)}>Cancel</button>
-                    <button className="wl-vet-confirm-yes"
-                      onClick={() => { onDelete(entry.id); setConfirmDelete(null); }}>Delete</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })
-      )}
+            )}
+          </div>
+        );
+      })}
 
-      {/* ── Clear all ── */}
       {sorted.length > 0 && (
         <div className="wl-clear-section">
           {confirmClear ? (
             <div className="wl-clear-confirm">
-              <span className="wl-clear-confirm-text">
-                Remove all {sorted.length} visit{sorted.length !== 1 ? 's' : ''}?
-              </span>
-              <button className="wl-clear-yes"
-                onClick={() => { onClearAll(); setConfirmClear(false); }}>Yes, clear</button>
-              <button className="wl-clear-no"
-                onClick={() => setConfirmClear(false)}>Cancel</button>
+              <span className="wl-clear-confirm-text">Remove all {sorted.length} visits?</span>
+              <button className="wl-clear-yes" onClick={() => { onClearAll(); setConfirmClear(false); }}>Yes, clear</button>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
             </div>
           ) : (
-            <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>
-              Clear all history
+            <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>Clear all history</button>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─── WeightSheet ──────────────────────────────────────────────────────────────
+function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
+  const entries = catData?.weight || [];
+  const [dateVal,      setDateVal]      = useState(todayISO());
+  const [lbsVal,       setLbsVal]       = useState('');
+  const [src,          setSrc]          = useState('Home');
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  function handleLog() {
+    if (!dateVal || !lbsVal) return;
+    const lbs = parseFloat(parseFloat(lbsVal).toFixed(1));
+    if (isNaN(lbs) || lbs <= 0) return;
+    onAdd({ id: Date.now().toString(), date: dateVal, lbs, src });
+    setLbsVal(''); setDateVal(todayISO()); setSrc('Home');
+  }
+
+  const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+
+  return (
+    <>
+      {/* Chart always at top */}
+      <WeightChart entries={entries} />
+
+      {/* Log form */}
+      <div className="wl-log-section">
+        <div className="wl-section-label">Date</div>
+        <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
+          onChange={e => setDateVal(e.target.value)} />
+
+        <div className="wl-section-label">Weight</div>
+        <div className="wl-weight-input-row">
+          <input
+            type="number" className="wl-lbs-input"
+            value={lbsVal} step="0.1" min="0" max="99" placeholder="0.0"
+            onChange={e => setLbsVal(e.target.value)}
+          />
+          <span className="wl-lbs-unit">lbs</span>
+        </div>
+
+        <div className="wl-section-label">Source</div>
+        <div className="wl-cat-toggles" style={{ marginBottom: 0 }}>
+          {['Home', 'Vet'].map(s => (
+            <button key={s} className={`wl-cat-toggle${src === s ? ' on' : ''}`}
+              onClick={() => setSrc(s)}>
+              {src === s && <span className="wl-toggle-check">✓</span>}{s}
             </button>
+          ))}
+        </div>
+
+        <div className="wl-log-row-end">
+          <button className="wl-log-btn" onClick={handleLog}
+            disabled={!dateVal || !lbsVal || saving}>
+            {saving ? '…' : 'Log Weight'}
+          </button>
+        </div>
+        {saving && <div className="wl-log-feedback">Saving…</div>}
+      </div>
+
+      {/* History table */}
+      <div className="wl-section-label">History ({sorted.length} entries)</div>
+      {sorted.length === 0 ? (
+        <div className="wl-history-empty">No weight entries yet — log the first one above!</div>
+      ) : (
+        <table className="wl-weight-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th style={{ textAlign:'center' }}>Lbs</th>
+              <th style={{ textAlign:'center' }}>Source</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map(entry => (
+              <tr key={entry.id ?? entry.date}>
+                <td className="wl-wt-date">{formatDate(entry.date)}</td>
+                <td className="wl-wt-lbs">{entry.lbs}</td>
+                <td className="wl-wt-src">{entry.src}</td>
+                <td className="wl-wt-del">
+                  <button className="wl-wt-del-btn" onClick={() => onDelete(entry.id)}>×</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {sorted.length > 0 && (
+        <div className="wl-clear-section">
+          {confirmClear ? (
+            <div className="wl-clear-confirm">
+              <span className="wl-clear-confirm-text">Remove all {sorted.length} entries?</span>
+              <button className="wl-clear-yes" onClick={() => { onClearAll(); setConfirmClear(false); }}>Yes, clear</button>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
+            </div>
+          ) : (
+            <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>Clear all history</button>
           )}
         </div>
       )}
@@ -903,7 +1122,7 @@ function VetSheet({ catId, catData, onAdd, onDelete, onClearAll, saving }) {
 function CatSelector({ activeCatId, onSelect, catData }) {
   return (
     <div className="wl-cat-selector">
-      {CATS.map((cat) => (
+      {CATS.map(cat => (
         <div key={cat.id}
           className={`wl-cat-card${activeCatId === cat.id ? ' active' : ''}`}
           onClick={() => onSelect(cat.id)}>
@@ -918,7 +1137,7 @@ function CatSelector({ activeCatId, onSelect, catData }) {
 
 // ─── CatsSection ──────────────────────────────────────────────────────────────
 function CatsSection({ catId, data, onOpenSheet }) {
-  const cat = CATS.find((c) => c.id === catId);
+  const cat = CATS.find(c => c.id === catId);
   return (
     <div className="wl-content">
       <div className="wl-profile-card">
@@ -931,23 +1150,19 @@ function CatsSection({ catId, data, onOpenSheet }) {
         </div>
       </div>
 
-      <CareCard    type="flea"  entries={data?.flea  ?? []} onTap={() => onOpenSheet('flea',  catId)} />
-      <CareCard    type="nails" entries={data?.nails ?? []} onTap={() => onOpenSheet('nails', catId)} />
-      <VetCareCard              entries={data?.vet   ?? []} onTap={() => onOpenSheet('vet',   catId)} />
+      <CareCard      type="flea"  entries={data?.flea   ?? []} onTap={() => onOpenSheet('flea',   catId)} />
+      <CareCard      type="nails" entries={data?.nails  ?? []} onTap={() => onOpenSheet('nails',  catId)} />
+      <VetCareCard                entries={data?.vet    ?? []} onTap={() => onOpenSheet('vet',    catId)} />
+      <WeightCareCard             entries={data?.weight ?? []} onTap={() => onOpenSheet('weight', catId)} />
 
-      {[
-        { icon: '⚖️', label: 'Weight',         sub: 'Track over time'      },
-        { icon: '📝', label: 'Health Journal', sub: 'Notes & observations' },
-      ].map(({ icon, label, sub }) => (
-        <div key={label} className="wl-placeholder-section">
-          <div className="wl-placeholder-icon">{icon}</div>
-          <div>
-            <div className="wl-placeholder-label">{label}</div>
-            <div className="wl-placeholder-sub">{sub}</div>
-          </div>
-          <div className="wl-coming-badge">Coming soon</div>
+      <div className="wl-placeholder-section">
+        <div className="wl-placeholder-icon">📝</div>
+        <div>
+          <div className="wl-placeholder-label">Health Journal</div>
+          <div className="wl-placeholder-sub">Notes & observations</div>
         </div>
-      ))}
+        <div className="wl-coming-badge">Coming soon</div>
+      </div>
     </div>
   );
 }
@@ -985,32 +1200,30 @@ function App() {
   useEffect(() => { catStateRef.current = catState; });
 
   const loadCat = useCallback(async (id) => {
-    setCatState((prev) => ({ ...prev, [id]: { ...prev[id], status: 'loading' } }));
+    setCatState(prev => ({ ...prev, [id]: { ...prev[id], status: 'loading' } }));
     try {
       const data = await fetchCat(id);
-      setCatState((prev) => ({ ...prev, [id]: { status: 'loaded', data } }));
+      setCatState(prev => ({ ...prev, [id]: { status: 'loaded', data } }));
     } catch (err) {
       console.error(err);
-      setCatState((prev) => ({ ...prev, [id]: { status: 'error', data: null } }));
+      setCatState(prev => ({ ...prev, [id]: { status: 'error', data: null } }));
     }
   }, []);
 
   useEffect(() => {
-    CATS.forEach((cat) => loadCat(cat.id));
+    CATS.forEach(cat => loadCat(cat.id));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Flea / nails: multi-cat log ───────────────────────────────────────────
+  // ── Flea / nails handlers ─────────────────────────────────────────────────
   const handleMultiLog = useCallback(async (type, date, catIds) => {
     const cs = catStateRef.current;
-    const updates = catIds
-      .map((id) => {
-        const data = cs[id]?.data;
-        if (!data) return null;
-        return { id, data: { ...data, [type]: [...(data[type] || []), { date }] } };
-      })
-      .filter(Boolean);
+    const updates = catIds.map(id => {
+      const data = cs[id]?.data;
+      if (!data) return null;
+      return { id, data: { ...data, [type]: [...(data[type] || []), { date }] } };
+    }).filter(Boolean);
     if (updates.length === 0) return;
-    setCatState((prev) => {
+    setCatState(prev => {
       const next = { ...prev };
       for (const { id, data } of updates) next[id] = { ...next[id], data };
       return next;
@@ -1021,30 +1234,26 @@ function App() {
     finally { setSaving(false); }
   }, []);
 
-  // ── Flea / nails: delete by date ──────────────────────────────────────────
   const handleDelete = useCallback(async (type, date, catId) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
-    const updated = { ...data, [type]: (data[type] || []).filter((e) => e.date !== date) };
-    setCatState((prev) => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
+    const updated = { ...data, [type]: (data[type] || []).filter(e => e.date !== date) };
+    setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
     catch (err) { console.error('Delete failed:', err); }
     finally { setSaving(false); }
   }, []);
 
-  // ── Flea / nails: clear all ───────────────────────────────────────────────
   const handleClearAll = useCallback(async (type) => {
     const cs = catStateRef.current;
-    const updates = CATS
-      .map((cat) => {
-        const data = cs[cat.id]?.data;
-        if (!data) return null;
-        return { id: cat.id, data: { ...data, [type]: [] } };
-      })
-      .filter(Boolean);
+    const updates = CATS.map(cat => {
+      const data = cs[cat.id]?.data;
+      if (!data) return null;
+      return { id: cat.id, data: { ...data, [type]: [] } };
+    }).filter(Boolean);
     if (updates.length === 0) return;
-    setCatState((prev) => {
+    setCatState(prev => {
       const next = { ...prev };
       for (const { id, data } of updates) next[id] = { ...next[id], data };
       return next;
@@ -1060,7 +1269,7 @@ function App() {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
     const updated = { ...data, [field]: [...(data[field] || []), entry] };
-    setCatState((prev) => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
+    setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
     catch (err) { console.error('Add entry failed:', err); }
@@ -1070,8 +1279,8 @@ function App() {
   const handleDeleteEntry = useCallback(async (catId, field, entryId) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
-    const updated = { ...data, [field]: (data[field] || []).filter((e) => e.id !== entryId) };
-    setCatState((prev) => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
+    const updated = { ...data, [field]: (data[field] || []).filter(e => e.id !== entryId) };
+    setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
     catch (err) { console.error('Delete entry failed:', err); }
@@ -1082,7 +1291,7 @@ function App() {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
     const updated = { ...data, [field]: [] };
-    setCatState((prev) => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
+    setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
     catch (err) { console.error('Clear field failed:', err); }
@@ -1090,13 +1299,13 @@ function App() {
   }, []);
 
   const { status, data } = catState[activeCatId];
-  const catDataMap = Object.fromEntries(CATS.map((c) => [c.id, catState[c.id].data]));
+  const catDataMap = Object.fromEntries(CATS.map(c => [c.id, catState[c.id].data]));
+  const catName    = CATS.find(c => c.id === openSheet?.catId)?.name ?? '';
 
-  // Sheet title
   const sheetTitle = openSheet
-    ? openSheet.type === 'vet'
-      ? `🏥 Vet Visits — ${CATS.find((c) => c.id === openSheet.catId)?.name}`
-      : `${CARE_CONFIG[openSheet.type].icon} ${CARE_CONFIG[openSheet.type].label}`
+    ? openSheet.type === 'vet'    ? `🏥 Vet Visits — ${catName}`
+    : openSheet.type === 'weight' ? `⚖️ Weight — ${catName}`
+    : `${CARE_CONFIG[openSheet.type].icon} ${CARE_CONFIG[openSheet.type].label}`
     : '';
 
   return (
@@ -1121,7 +1330,7 @@ function App() {
             {status === 'loading' && (
               <div className="wl-state">
                 <div className="wl-spinner" />
-                <div className="wl-state-sub">Loading {CATS.find((c) => c.id === activeCatId)?.name}…</div>
+                <div className="wl-state-sub">Loading {CATS.find(c => c.id === activeCatId)?.name}…</div>
               </div>
             )}
             {status === 'error' && (
@@ -1136,9 +1345,7 @@ function App() {
               <CatsSection catId={activeCatId} data={data}
                 onOpenSheet={(type, catId) => setOpenSheet({ type, catId })} />
             )}
-            {status === 'idle' && (
-              <div className="wl-state"><div className="wl-spinner" /></div>
-            )}
+            {status === 'idle' && <div className="wl-state"><div className="wl-spinner" /></div>}
           </>
         )}
 
@@ -1160,11 +1367,18 @@ function App() {
         <BottomSheet title={sheetTitle} onClose={() => setOpenSheet(null)}>
           {openSheet.type === 'vet' ? (
             <VetSheet
-              catId={openSheet.catId}
               catData={catState[openSheet.catId]?.data}
-              onAdd={(entry)   => handleAddEntry(openSheet.catId, 'vet', entry)}
-              onDelete={(id)   => handleDeleteEntry(openSheet.catId, 'vet', id)}
-              onClearAll={()   => handleClearField(openSheet.catId, 'vet')}
+              onAdd={entry  => handleAddEntry(openSheet.catId, 'vet', entry)}
+              onDelete={id  => handleDeleteEntry(openSheet.catId, 'vet', id)}
+              onClearAll={() => handleClearField(openSheet.catId, 'vet')}
+              saving={saving}
+            />
+          ) : openSheet.type === 'weight' ? (
+            <WeightSheet
+              catData={catState[openSheet.catId]?.data}
+              onAdd={entry  => handleAddEntry(openSheet.catId, 'weight', entry)}
+              onDelete={id  => handleDeleteEntry(openSheet.catId, 'weight', id)}
+              onClearAll={() => handleClearField(openSheet.catId, 'weight')}
               saving={saving}
             />
           ) : (
