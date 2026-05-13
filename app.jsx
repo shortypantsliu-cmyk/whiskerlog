@@ -130,6 +130,8 @@ async function saveCat(id, data) {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
+// Minimum font size: 13px (body copy, labels, badges, secondary text)
+// Exception: SVG chart axis labels at 11px (decorative reference points)
 const styles = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -152,7 +154,7 @@ const styles = `
   }
   .wl-header-icon  { font-size: 28px; flex-shrink: 0; line-height: 1; }
   .wl-header-title { font-weight: 800; font-size: 17px; line-height: 1.1; }
-  .wl-header-sub   { font-size: 12px; opacity: .85; margin-top: 1px; }
+  .wl-header-sub   { font-size: 13px; opacity: .85; margin-top: 1px; }
 
   /* ── CAT SELECTOR ── */
   .wl-cat-selector {
@@ -179,7 +181,7 @@ const styles = `
   }
   .wl-cat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .wl-cat-name { font-weight: 800; font-size: 15px; color: #3D2010; }
-  .wl-cat-desc { font-size: 11px; color: #6B4E38; }
+  .wl-cat-desc { font-size: 13px; color: #6B4E38; }
 
   /* ── PAGE WRAP ── */
   .wl-page    { padding-bottom: 80px; }
@@ -231,12 +233,12 @@ const styles = `
   .wl-care-icon  { font-size: 28px; flex-shrink: 0; line-height: 1; }
   .wl-care-body  { flex: 1; min-width: 0; }
   .wl-care-label { font-size: 15px; font-weight: 700; color: #3D2010; }
-  .wl-care-last  { font-size: 12px; color: #9E8070; margin-top: 2px; }
+  .wl-care-last  { font-size: 13px; color: #9E8070; margin-top: 2px; }
   .wl-care-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
   .wl-status-badge {
     display: inline-flex; align-items: center; gap: 5px;
     border-radius: 20px; padding: 4px 10px;
-    font-size: 11px; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
+    font-size: 13px; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
   }
   .wl-status-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .wl-status-green { background: #EDFAF1; color: #186F3C; }
@@ -258,7 +260,7 @@ const styles = `
   .wl-placeholder-sub   { font-size: 13px; color: #6B4E38; margin-top: 2px; }
   .wl-coming-badge {
     margin-left: auto; flex-shrink: 0; background: #FFF5EE; border: 1px solid #EDD9C5;
-    border-radius: 20px; padding: 4px 10px; font-size: 10px; font-weight: 700; color: #C96A3A;
+    border-radius: 20px; padding: 4px 10px; font-size: 13px; font-weight: 700; color: #C96A3A;
   }
 
   /* ── BOTTOM SHEET ── */
@@ -298,8 +300,8 @@ const styles = `
   /* ── SHARED FORM ELEMENTS ── */
   .wl-log-section { margin-bottom: 22px; }
   .wl-section-label {
-    font-size: 11px; font-weight: 700; color: #9E8070;
-    letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px;
+    font-size: 13px; font-weight: 700; color: #9E8070;
+    letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px;
   }
   .wl-optional { font-weight: 400; text-transform: none; letter-spacing: 0; }
   .wl-date-input {
@@ -342,7 +344,7 @@ const styles = `
   }
   .wl-cat-toggle.on { border-color: #C96A3A; background: #FFF5EE; color: #C96A3A; }
   .wl-cat-toggle:disabled { opacity: .4; cursor: default; }
-  .wl-toggle-check { font-size: 12px; }
+  .wl-toggle-check { font-size: 13px; }
 
   .wl-log-row-end { display: flex; justify-content: flex-end; margin-top: 12px; }
   .wl-log-btn {
@@ -350,21 +352,21 @@ const styles = `
     border-radius: 12px; padding: 11px 28px; font-size: 14px; font-weight: 700; transition: opacity .1s;
   }
   .wl-log-btn:disabled { opacity: .45; cursor: not-allowed; }
-  .wl-log-feedback { margin-top: 8px; font-size: 12px; color: #9E8070; min-height: 18px; }
+  .wl-log-feedback { margin-top: 8px; font-size: 13px; color: #9E8070; min-height: 18px; }
   .wl-log-feedback.error { color: #B03020; }
 
   /* ── FLEA / NAILS HISTORY TABLE ── */
   .wl-history-empty { font-size: 14px; color: #BBA090; padding: 10px 0; font-style: italic; }
   .wl-hist-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .wl-hist-table thead th {
-    font-size: 11px; font-weight: 800; color: #9E8070;
-    letter-spacing: .07em; text-transform: uppercase; padding-bottom: 10px; text-align: center;
+    font-size: 13px; font-weight: 800; color: #9E8070;
+    letter-spacing: .05em; text-transform: uppercase; padding-bottom: 10px; text-align: center;
   }
   .wl-hist-table thead th:first-child { text-align: left; }
   .wl-hist-table tbody tr { border-top: 1px solid rgba(220,170,130,.2); }
   .wl-hist-date-cell { padding: 9px 0; vertical-align: middle; width: 45%; }
   .wl-hist-date-main { font-size: 13px; font-weight: 700; color: #3D2010; }
-  .wl-hist-date-sub  { font-size: 11px; color: #9E8070; margin-top: 2px; }
+  .wl-hist-date-sub  { font-size: 13px; color: #9E8070; margin-top: 2px; }
   .wl-hist-cat-cell  { text-align: center; vertical-align: middle; width: 18.33%; }
   .wl-hist-check-btn {
     background: none; border: none; color: #2AB25B; font-size: 17px; font-weight: 700;
@@ -389,16 +391,16 @@ const styles = `
   }
   .wl-vet-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .wl-vet-card-date  { font-size: 14px; font-weight: 700; color: #3D2010; }
-  .wl-vet-card-ago   { font-size: 11px; color: #9E8070; margin-top: 2px; }
+  .wl-vet-card-ago   { font-size: 13px; color: #9E8070; margin-top: 2px; }
   .wl-vet-card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .wl-vet-type-badge {
     display: inline-block; background: #FFF5EE; border: 1px solid #EDD9C5;
     border-radius: 10px; padding: 3px 10px;
-    font-size: 11px; font-weight: 700; color: #C96A3A; white-space: nowrap;
+    font-size: 13px; font-weight: 700; color: #C96A3A; white-space: nowrap;
   }
   .wl-vet-delete-btn {
     background: none; border: none; color: #C0A898;
-    font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; padding: 4px 8px; border-radius: 8px;
     white-space: nowrap; transition: color .12s;
   }
   .wl-vet-delete-btn:active { color: #D94030; }
@@ -411,11 +413,11 @@ const styles = `
   .wl-vet-confirm-btns { display: flex; gap: 8px; }
   .wl-vet-confirm-yes {
     background: #D94030; color: white; border: none;
-    border-radius: 10px; padding: 6px 14px; font-size: 12px; font-weight: 700;
+    border-radius: 10px; padding: 6px 14px; font-size: 13px; font-weight: 700;
   }
   .wl-vet-confirm-no {
     background: #F0EAE4; color: #6B4E38; border: none;
-    border-radius: 10px; padding: 6px 14px; font-size: 12px; font-weight: 700;
+    border-radius: 10px; padding: 6px 14px; font-size: 13px; font-weight: 700;
   }
 
   /* ── WEIGHT CHART ── */
@@ -442,15 +444,15 @@ const styles = `
   /* ── WEIGHT HISTORY TABLE ── */
   .wl-weight-table { width: 100%; border-collapse: collapse; }
   .wl-weight-table thead th {
-    font-size: 11px; font-weight: 800; color: #9E8070;
-    letter-spacing: .07em; text-transform: uppercase; padding-bottom: 8px; text-align: left;
+    font-size: 13px; font-weight: 800; color: #9E8070;
+    letter-spacing: .05em; text-transform: uppercase; padding-bottom: 8px; text-align: left;
   }
   .wl-weight-table thead th:nth-child(2),
   .wl-weight-table thead th:nth-child(3) { text-align: center; }
   .wl-weight-table tbody tr { border-top: 1px solid rgba(220,170,130,.15); }
   .wl-wt-date { font-size: 13px; color: #3D2010; padding: 8px 0; }
   .wl-wt-lbs  { font-size: 14px; font-weight: 800; color: #C96A3A; text-align: center; padding: 8px 4px; }
-  .wl-wt-src  { font-size: 12px; color: #9E8070; text-align: center; padding: 8px 4px; }
+  .wl-wt-src  { font-size: 13px; color: #9E8070; text-align: center; padding: 8px 4px; }
   .wl-wt-del  { text-align: right; padding: 8px 0 8px 4px; }
   .wl-wt-del-btn {
     background: none; border: none; color: #C0A898;
@@ -491,7 +493,7 @@ const styles = `
   .wl-diary-placeholder-sub   { font-size: 14px; color: #9E8070; line-height: 1.6; max-width: 280px; }
   .wl-diary-badge {
     background: #FFF5EE; border: 1.5px solid #EDD9C5; border-radius: 20px; padding: 6px 18px;
-    font-size: 12px; font-weight: 700; color: #C96A3A; margin-top: 4px;
+    font-size: 13px; font-weight: 700; color: #C96A3A; margin-top: 4px;
   }
 
   /* ── BOTTOM NAV ── */
@@ -504,7 +506,7 @@ const styles = `
   .wl-nav-tab {
     flex: 1; display: flex; flex-direction: column; align-items: center;
     gap: 3px; padding: 10px 0 11px; border: none; background: none;
-    color: #BBA090; transition: color .12s; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    color: #BBA090; transition: color .12s; font-size: 13px; font-weight: 700; letter-spacing: .04em;
   }
   .wl-nav-tab.active { color: #C96A3A; }
   .wl-nav-tab-icon { font-size: 22px; line-height: 1; }
@@ -601,46 +603,35 @@ function WeightCareCard({ entries, onTap }) {
 }
 
 // ─── WeightChart ──────────────────────────────────────────────────────────────
-// SVG line chart. Tap a dot to see date + weight tooltip; tap again or tap
-// anywhere else to dismiss.
 function WeightChart({ entries }) {
-  const [tooltip, setTooltip] = useState(null); // { date, lbs, src } | null
+  const [tooltip, setTooltip] = useState(null);
 
   if (!entries || entries.length === 0) {
     return <div className="wl-chart-empty">No weight data yet — log the first entry below.</div>;
   }
 
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
-
-  // Chart geometry
   const W = 340, H = 140;
   const PAD = { l: 36, r: 10, t: 16, b: 28 };
-  const pw = W - PAD.l - PAD.r;  // 294
-  const ph = H - PAD.t - PAD.b;  // 96
+  const pw = W - PAD.l - PAD.r;
+  const ph = H - PAD.t - PAD.b;
 
-  // X scale — time
   const toMs  = (iso) => new Date(iso + 'T12:00:00').getTime();
   const tsArr = sorted.map(e => toMs(e.date));
-  const minTs = tsArr[0];
-  const maxTs = tsArr[tsArr.length - 1];
+  const minTs = tsArr[0], maxTs = tsArr[tsArr.length - 1];
   const tsSpan = maxTs - minTs || 1;
   const xOf = (iso) => sorted.length === 1
     ? PAD.l + pw / 2
     : PAD.l + ((toMs(iso) - minTs) / tsSpan) * pw;
 
-  // Y scale — weight, padded 20% above and below data range
   const lbsArr = sorted.map(e => parseFloat(e.lbs));
-  const dMin   = Math.min(...lbsArr);
-  const dMax   = Math.max(...lbsArr);
-  const pad    = (dMax - dMin || 1) * 0.2;
-  const yMin   = dMin - pad;
-  const yMax   = dMax + pad;
-  const yOf    = (lbs) => PAD.t + ph - ((lbs - yMin) / (yMax - yMin)) * ph;
+  const dMin = Math.min(...lbsArr), dMax = Math.max(...lbsArr);
+  const pad  = (dMax - dMin || 1) * 0.2;
+  const yMin = dMin - pad, yMax = dMax + pad;
+  const yOf  = (lbs) => PAD.t + ph - ((lbs - yMin) / (yMax - yMin)) * ph;
 
-  // Y grid labels (4 evenly spaced)
   const yLabels = Array.from({ length: 4 }, (_, i) => +(yMin + (yMax - yMin) * (i / 3)).toFixed(1));
 
-  // X axis labels: first, middle, last (up to 3)
   const spanDays = (maxTs - minTs) / 86400000;
   const xFmt = (iso) => {
     const [y, m, d] = iso.split('-').map(Number);
@@ -651,10 +642,7 @@ function WeightChart({ entries }) {
     : sorted.length === 2 ? [0, 1]
     : [0, Math.floor((sorted.length - 1) / 2), sorted.length - 1];
 
-  // SVG polyline points
   const ptStr = sorted.map(e => `${xOf(e.date).toFixed(1)},${yOf(e.lbs).toFixed(1)}`).join(' ');
-
-  // Tooltip geometry
   const TW = 114, TH = 44;
 
   function handleDot(e, entry) {
@@ -672,81 +660,53 @@ function WeightChart({ entries }) {
 
   return (
     <div className="wl-chart-wrap">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-        onClick={() => setTooltip(null)}
-      >
-        {/* Transparent background to capture taps */}
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}
+        onClick={() => setTooltip(null)}>
         <rect x={0} y={0} width={W} height={H} fill="transparent" />
 
-        {/* Y grid lines + labels */}
+        {/* Y grid + labels — 11px exception for chart axis */}
         {yLabels.map((v, i) => (
           <g key={i}>
-            <line
-              x1={PAD.l} y1={yOf(v)} x2={W - PAD.r} y2={yOf(v)}
-              stroke="#EDD9C5" strokeWidth="1" strokeDasharray="3,3"
-            />
-            <text
-              x={PAD.l - 5} y={yOf(v) + 4}
-              textAnchor="end" fontSize="9" fill="#B0A090" fontFamily="Nunito, sans-serif"
-            >{v}</text>
+            <line x1={PAD.l} y1={yOf(v)} x2={W - PAD.r} y2={yOf(v)}
+              stroke="#EDD9C5" strokeWidth="1" strokeDasharray="3,3" />
+            <text x={PAD.l - 5} y={yOf(v) + 4}
+              textAnchor="end" fontSize="11" fill="#B0A090" fontFamily="Nunito, sans-serif">{v}</text>
           </g>
         ))}
 
-        {/* X axis labels */}
+        {/* X labels — 11px exception for chart axis */}
         {xLabelIdxs.map(idx => (
-          <text key={idx}
-            x={xOf(sorted[idx].date)} y={H - PAD.b + 14}
-            textAnchor="middle" fontSize="9" fill="#B0A090" fontFamily="Nunito, sans-serif"
-          >{xFmt(sorted[idx].date)}</text>
+          <text key={idx} x={xOf(sorted[idx].date)} y={H - PAD.b + 14}
+            textAnchor="middle" fontSize="11" fill="#B0A090" fontFamily="Nunito, sans-serif">
+            {xFmt(sorted[idx].date)}
+          </text>
         ))}
 
-        {/* Data line */}
         {sorted.length > 1 && (
-          <polyline
-            points={ptStr}
-            fill="none" stroke="#C96A3A" strokeWidth="2"
-            strokeLinecap="round" strokeLinejoin="round"
-          />
+          <polyline points={ptStr} fill="none" stroke="#C96A3A" strokeWidth="2"
+            strokeLinecap="round" strokeLinejoin="round" />
         )}
 
-        {/* Data dots */}
         {sorted.map((entry, i) => {
-          const cx = xOf(entry.date);
-          const cy = yOf(entry.lbs);
+          const cx = xOf(entry.date), cy = yOf(entry.lbs);
           const sel = tip?.date === entry.date;
           return (
             <g key={i} onClick={(e) => handleDot(e, entry)} style={{ cursor: 'pointer' }}>
-              {/* Invisible larger tap target */}
               <circle cx={cx} cy={cy} r={14} fill="transparent" />
-              <circle
-                cx={cx} cy={cy} r={sel ? 6 : 4}
-                fill={sel ? '#8C3E1A' : '#C96A3A'}
-                stroke="white" strokeWidth={sel ? 2.5 : 2}
-              />
+              <circle cx={cx} cy={cy} r={sel ? 6 : 4}
+                fill={sel ? '#8C3E1A' : '#C96A3A'} stroke="white" strokeWidth={sel ? 2.5 : 2} />
             </g>
           );
         })}
 
-        {/* Tooltip */}
         {tip && (
           <g style={{ pointerEvents: 'none' }}>
-            <rect
-              x={tipX - TW / 2} y={tipY}
-              width={TW} height={TH} rx={8}
-              fill="white" stroke="#EDD9C5" strokeWidth="1.5"
-            />
-            <text
-              x={tipX} y={tipY + 16}
-              textAnchor="middle" fontSize="10" fill="#6B4E38"
-              fontFamily="Nunito, sans-serif" fontWeight="600"
-            >{formatDate(tip.date)}</text>
-            <text
-              x={tipX} y={tipY + 33}
-              textAnchor="middle" fontSize="13" fill="#C96A3A"
-              fontFamily="Nunito, sans-serif" fontWeight="800"
-            >{tip.lbs} lbs · {tip.src}</text>
+            <rect x={tipX - TW/2} y={tipY} width={TW} height={TH} rx={8}
+              fill="white" stroke="#EDD9C5" strokeWidth="1.5" />
+            <text x={tipX} y={tipY + 16} textAnchor="middle" fontSize="10" fill="#6B4E38"
+              fontFamily="Nunito, sans-serif" fontWeight="600">{formatDate(tip.date)}</text>
+            <text x={tipX} y={tipY + 33} textAnchor="middle" fontSize="13" fill="#C96A3A"
+              fontFamily="Nunito, sans-serif" fontWeight="800">{tip.lbs} lbs · {tip.src}</text>
           </g>
         )}
       </svg>
@@ -1034,25 +994,19 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
 
   return (
     <>
-      {/* Chart always at top */}
       <WeightChart entries={entries} />
 
-      {/* Log form */}
       <div className="wl-log-section">
         <div className="wl-section-label">Date</div>
         <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
           onChange={e => setDateVal(e.target.value)} />
-
         <div className="wl-section-label">Weight</div>
         <div className="wl-weight-input-row">
-          <input
-            type="number" className="wl-lbs-input"
-            value={lbsVal} step="0.1" min="0" max="99" placeholder="0.0"
-            onChange={e => setLbsVal(e.target.value)}
-          />
+          <input type="number" className="wl-lbs-input" value={lbsVal}
+            step="0.1" min="0" max="99" placeholder="0.0"
+            onChange={e => setLbsVal(e.target.value)} />
           <span className="wl-lbs-unit">lbs</span>
         </div>
-
         <div className="wl-section-label">Source</div>
         <div className="wl-cat-toggles" style={{ marginBottom: 0 }}>
           {['Home', 'Vet'].map(s => (
@@ -1062,7 +1016,6 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
             </button>
           ))}
         </div>
-
         <div className="wl-log-row-end">
           <button className="wl-log-btn" onClick={handleLog}
             disabled={!dateVal || !lbsVal || saving}>
@@ -1072,7 +1025,6 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
         {saving && <div className="wl-log-feedback">Saving…</div>}
       </div>
 
-      {/* History table */}
       <div className="wl-section-label">History ({sorted.length} entries)</div>
       {sorted.length === 0 ? (
         <div className="wl-history-empty">No weight entries yet — log the first one above!</div>
@@ -1150,10 +1102,10 @@ function CatsSection({ catId, data, onOpenSheet }) {
         </div>
       </div>
 
-      <CareCard      type="flea"  entries={data?.flea   ?? []} onTap={() => onOpenSheet('flea',   catId)} />
-      <CareCard      type="nails" entries={data?.nails  ?? []} onTap={() => onOpenSheet('nails',  catId)} />
-      <VetCareCard                entries={data?.vet    ?? []} onTap={() => onOpenSheet('vet',    catId)} />
-      <WeightCareCard             entries={data?.weight ?? []} onTap={() => onOpenSheet('weight', catId)} />
+      <CareCard       type="flea"  entries={data?.flea   ?? []} onTap={() => onOpenSheet('flea',   catId)} />
+      <CareCard       type="nails" entries={data?.nails  ?? []} onTap={() => onOpenSheet('nails',  catId)} />
+      <VetCareCard                 entries={data?.vet    ?? []} onTap={() => onOpenSheet('vet',    catId)} />
+      <WeightCareCard              entries={data?.weight ?? []} onTap={() => onOpenSheet('weight', catId)} />
 
       <div className="wl-placeholder-section">
         <div className="wl-placeholder-icon">📝</div>
@@ -1187,7 +1139,7 @@ function DiarySection() {
 function App() {
   const [activeTab,    setActiveTab]   = useState('cats');
   const [activeCatId, setActiveCatId] = useState('pip');
-  const [openSheet,   setOpenSheet]   = useState(null); // { type, catId } | null
+  const [openSheet,   setOpenSheet]   = useState(null);
   const [saving,      setSaving]      = useState(false);
 
   const [catState, setCatState] = useState({
@@ -1214,7 +1166,6 @@ function App() {
     CATS.forEach(cat => loadCat(cat.id));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Flea / nails handlers ─────────────────────────────────────────────────
   const handleMultiLog = useCallback(async (type, date, catIds) => {
     const cs = catStateRef.current;
     const updates = catIds.map(id => {
@@ -1264,7 +1215,6 @@ function App() {
     finally { setSaving(false); }
   }, []);
 
-  // ── Generic per-cat handlers (vet, weight, journal) ───────────────────────
   const handleAddEntry = useCallback(async (catId, field, entry) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
@@ -1368,7 +1318,7 @@ function App() {
           {openSheet.type === 'vet' ? (
             <VetSheet
               catData={catState[openSheet.catId]?.data}
-              onAdd={entry  => handleAddEntry(openSheet.catId, 'vet', entry)}
+              onAdd={entry => handleAddEntry(openSheet.catId, 'vet', entry)}
               onDelete={id  => handleDeleteEntry(openSheet.catId, 'vet', id)}
               onClearAll={() => handleClearField(openSheet.catId, 'vet')}
               saving={saving}
@@ -1376,7 +1326,7 @@ function App() {
           ) : openSheet.type === 'weight' ? (
             <WeightSheet
               catData={catState[openSheet.catId]?.data}
-              onAdd={entry  => handleAddEntry(openSheet.catId, 'weight', entry)}
+              onAdd={entry => handleAddEntry(openSheet.catId, 'weight', entry)}
               onDelete={id  => handleDeleteEntry(openSheet.catId, 'weight', id)}
               onClearAll={() => handleClearField(openSheet.catId, 'weight')}
               saving={saving}
