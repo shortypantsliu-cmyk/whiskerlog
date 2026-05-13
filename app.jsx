@@ -130,8 +130,6 @@ async function saveCat(id, data) {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-// Minimum font size: 13px (body copy, labels, badges, secondary text)
-// Exception: SVG chart axis labels at 11px (decorative reference points)
 const styles = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -160,8 +158,7 @@ const styles = `
   .wl-cat-selector {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 8px; padding: 12px 12px 4px;
-    background: #FDF8F0;
-    position: sticky; top: 56px; z-index: 19;
+    background: #FDF8F0; position: sticky; top: 56px; z-index: 19;
   }
   .wl-cat-card {
     background: white; border: 2.5px solid #EDD9C5;
@@ -249,20 +246,6 @@ const styles = `
   .wl-status-red   .wl-status-dot { background: #D94030; }
   .wl-care-chevron { font-size: 18px; color: #C0A898; line-height: 1; }
 
-  /* ── PLACEHOLDER SECTIONS ── */
-  .wl-placeholder-section {
-    background: white; border-radius: 16px; padding: 20px 16px; margin-bottom: 10px;
-    box-shadow: 0 2px 10px rgba(180,100,40,.07); border: 1px solid rgba(220,170,130,.2);
-    display: flex; align-items: center; gap: 12px; opacity: .5;
-  }
-  .wl-placeholder-icon  { font-size: 28px; flex-shrink: 0; }
-  .wl-placeholder-label { font-size: 15px; font-weight: 700; color: #3D2010; }
-  .wl-placeholder-sub   { font-size: 13px; color: #6B4E38; margin-top: 2px; }
-  .wl-coming-badge {
-    margin-left: auto; flex-shrink: 0; background: #FFF5EE; border: 1px solid #EDD9C5;
-    border-radius: 20px; padding: 4px 10px; font-size: 13px; font-weight: 700; color: #C96A3A;
-  }
-
   /* ── BOTTOM SHEET ── */
   .wl-sheet-backdrop {
     position: fixed; inset: 0; z-index: 40;
@@ -324,7 +307,7 @@ const styles = `
   }
   .wl-select-input:focus { border-color: #C96A3A; box-shadow: 0 0 0 3px rgba(201,106,58,.12); }
 
-  /* ── NOTES TEXTAREA ── */
+  /* ── NOTES / JOURNAL TEXTAREA ── */
   .wl-notes-input {
     width: 100%; border: 1.5px solid #EDD9C5; border-radius: 12px;
     padding: 11px 12px; font-size: 15px; color: #2D1506; line-height: 1.55;
@@ -423,13 +406,9 @@ const styles = `
   /* ── WEIGHT CHART ── */
   .wl-chart-wrap {
     background: white; border-radius: 14px; padding: 8px 6px 6px;
-    border: 1px solid rgba(220,170,130,.2); margin-bottom: 20px;
-    user-select: none;
+    border: 1px solid rgba(220,170,130,.2); margin-bottom: 20px; user-select: none;
   }
-  .wl-chart-empty {
-    font-size: 14px; color: #BBA090; font-style: italic;
-    padding: 28px 0; text-align: center;
-  }
+  .wl-chart-empty { font-size: 14px; color: #BBA090; font-style: italic; padding: 28px 0; text-align: center; }
 
   /* ── WEIGHT INPUT ── */
   .wl-weight-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
@@ -460,6 +439,56 @@ const styles = `
     cursor: pointer; border-radius: 6px; transition: color .12s;
   }
   .wl-wt-del-btn:active { color: #D94030; }
+
+  /* ── JOURNAL CARDS ── */
+  .wl-journal-card {
+    background: #FDF8F0; border-radius: 12px;
+    border: 1px solid rgba(220,170,130,.25);
+    padding: 12px 14px; margin-bottom: 8px;
+    cursor: pointer; transition: background .1s;
+  }
+  .wl-journal-card:active { background: #FAF2E8; }
+  .wl-journal-card-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .wl-journal-date { font-size: 14px; font-weight: 700; color: #3D2010; }
+  .wl-journal-ago  { font-size: 13px; color: #9E8070; margin-top: 2px; }
+  .wl-journal-chevron {
+    font-size: 18px; color: #C0A898; flex-shrink: 0;
+    transition: transform .15s; line-height: 1;
+  }
+  .wl-journal-chevron.open { transform: rotate(90deg); }
+  .wl-journal-text {
+    font-size: 14px; color: #5C3D28; margin-top: 10px;
+    line-height: 1.6; white-space: pre-wrap;
+  }
+  .wl-journal-actions {
+    display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid rgba(220,170,130,.2);
+  }
+  .wl-journal-edit-btn {
+    background: #FFF5EE; border: 1px solid #EDD9C5; border-radius: 10px;
+    padding: 6px 16px; font-size: 13px; font-weight: 700; color: #C96A3A;
+  }
+  .wl-journal-delete-btn {
+    background: none; border: none; color: #C0A898;
+    font-size: 13px; font-weight: 700; padding: 6px 8px; border-radius: 10px;
+    transition: color .12s;
+  }
+  .wl-journal-delete-btn:active { color: #D94030; }
+  .wl-journal-edit-form { margin-top: 10px; }
+  .wl-journal-edit-actions {
+    display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;
+  }
+  .wl-journal-save-btn {
+    background: #C96A3A; color: white; border: none;
+    border-radius: 10px; padding: 7px 20px; font-size: 13px; font-weight: 700;
+  }
+  .wl-journal-save-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .wl-journal-cancel-btn {
+    background: #F0EAE4; color: #6B4E38; border: none;
+    border-radius: 10px; padding: 7px 14px; font-size: 13px; font-weight: 700;
+  }
 
   /* ── CLEAR ALL ── */
   .wl-clear-section {
@@ -602,26 +631,42 @@ function WeightCareCard({ entries, onTap }) {
   );
 }
 
+// ─── JournalCareCard ──────────────────────────────────────────────────────────
+function JournalCareCard({ entries, onTap }) {
+  const sorted = [...(entries || [])].sort((a, b) => b.date.localeCompare(a.date));
+  const last   = sorted[0];
+  const lastText = last
+    ? `Last entry: ${formatDate(last.date)}`
+    : 'No entries yet — tap to add';
+  return (
+    <div className="wl-care-card" onClick={onTap}>
+      <div className="wl-care-icon">📝</div>
+      <div className="wl-care-body">
+        <div className="wl-care-label">Health Journal</div>
+        <div className="wl-care-last">{lastText}</div>
+      </div>
+      <div className="wl-care-right">
+        <div className="wl-care-chevron">›</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── WeightChart ──────────────────────────────────────────────────────────────
 function WeightChart({ entries }) {
   const [tooltip, setTooltip] = useState(null);
-
-  if (!entries || entries.length === 0) {
+  if (!entries || entries.length === 0)
     return <div className="wl-chart-empty">No weight data yet — log the first entry below.</div>;
-  }
 
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
   const W = 340, H = 140;
   const PAD = { l: 36, r: 10, t: 16, b: 28 };
-  const pw = W - PAD.l - PAD.r;
-  const ph = H - PAD.t - PAD.b;
+  const pw = W - PAD.l - PAD.r, ph = H - PAD.t - PAD.b;
 
   const toMs  = (iso) => new Date(iso + 'T12:00:00').getTime();
   const tsArr = sorted.map(e => toMs(e.date));
-  const minTs = tsArr[0], maxTs = tsArr[tsArr.length - 1];
-  const tsSpan = maxTs - minTs || 1;
-  const xOf = (iso) => sorted.length === 1
-    ? PAD.l + pw / 2
+  const minTs = tsArr[0], maxTs = tsArr[tsArr.length - 1], tsSpan = maxTs - minTs || 1;
+  const xOf   = (iso) => sorted.length === 1 ? PAD.l + pw/2
     : PAD.l + ((toMs(iso) - minTs) / tsSpan) * pw;
 
   const lbsArr = sorted.map(e => parseFloat(e.lbs));
@@ -630,17 +675,15 @@ function WeightChart({ entries }) {
   const yMin = dMin - pad, yMax = dMax + pad;
   const yOf  = (lbs) => PAD.t + ph - ((lbs - yMin) / (yMax - yMin)) * ph;
 
-  const yLabels = Array.from({ length: 4 }, (_, i) => +(yMin + (yMax - yMin) * (i / 3)).toFixed(1));
-
+  const yLabels = Array.from({ length: 4 }, (_, i) => +(yMin + (yMax - yMin) * (i/3)).toFixed(1));
   const spanDays = (maxTs - minTs) / 86400000;
   const xFmt = (iso) => {
     const [y, m, d] = iso.split('-').map(Number);
     const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1];
     return spanDays > 180 ? `${mn} '${String(y).slice(2)}` : `${mn} ${d}`;
   };
-  const xLabelIdxs = sorted.length === 1 ? [0]
-    : sorted.length === 2 ? [0, 1]
-    : [0, Math.floor((sorted.length - 1) / 2), sorted.length - 1];
+  const xLabelIdxs = sorted.length === 1 ? [0] : sorted.length === 2 ? [0,1]
+    : [0, Math.floor((sorted.length-1)/2), sorted.length-1];
 
   const ptStr = sorted.map(e => `${xOf(e.date).toFixed(1)},${yOf(e.lbs).toFixed(1)}`).join(' ');
   const TW = 114, TH = 44;
@@ -653,59 +696,51 @@ function WeightChart({ entries }) {
   const tip = tooltip;
   let tipX = 0, tipY = 0;
   if (tip) {
-    tipX = Math.max(TW / 2 + 2, Math.min(W - TW / 2 - 2, xOf(tip.date)));
+    tipX = Math.max(TW/2+2, Math.min(W-TW/2-2, xOf(tip.date)));
     const dotY = yOf(tip.lbs);
-    tipY = dotY > TH + 20 ? dotY - TH - 12 : dotY + 14;
+    tipY = dotY > TH+20 ? dotY-TH-12 : dotY+14;
   }
 
   return (
     <div className="wl-chart-wrap">
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width:'100%', height:'auto', display:'block' }}
         onClick={() => setTooltip(null)}>
         <rect x={0} y={0} width={W} height={H} fill="transparent" />
-
-        {/* Y grid + labels — 11px exception for chart axis */}
         {yLabels.map((v, i) => (
           <g key={i}>
-            <line x1={PAD.l} y1={yOf(v)} x2={W - PAD.r} y2={yOf(v)}
+            <line x1={PAD.l} y1={yOf(v)} x2={W-PAD.r} y2={yOf(v)}
               stroke="#EDD9C5" strokeWidth="1" strokeDasharray="3,3" />
-            <text x={PAD.l - 5} y={yOf(v) + 4}
-              textAnchor="end" fontSize="11" fill="#B0A090" fontFamily="Nunito, sans-serif">{v}</text>
+            <text x={PAD.l-5} y={yOf(v)+4} textAnchor="end" fontSize="11" fill="#B0A090"
+              fontFamily="Nunito, sans-serif">{v}</text>
           </g>
         ))}
-
-        {/* X labels — 11px exception for chart axis */}
         {xLabelIdxs.map(idx => (
-          <text key={idx} x={xOf(sorted[idx].date)} y={H - PAD.b + 14}
+          <text key={idx} x={xOf(sorted[idx].date)} y={H-PAD.b+14}
             textAnchor="middle" fontSize="11" fill="#B0A090" fontFamily="Nunito, sans-serif">
             {xFmt(sorted[idx].date)}
           </text>
         ))}
-
         {sorted.length > 1 && (
           <polyline points={ptStr} fill="none" stroke="#C96A3A" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round" />
         )}
-
         {sorted.map((entry, i) => {
-          const cx = xOf(entry.date), cy = yOf(entry.lbs);
-          const sel = tip?.date === entry.date;
+          const cx = xOf(entry.date), cy = yOf(entry.lbs), sel = tip?.date === entry.date;
           return (
-            <g key={i} onClick={(e) => handleDot(e, entry)} style={{ cursor: 'pointer' }}>
+            <g key={i} onClick={e => handleDot(e, entry)} style={{ cursor:'pointer' }}>
               <circle cx={cx} cy={cy} r={14} fill="transparent" />
               <circle cx={cx} cy={cy} r={sel ? 6 : 4}
                 fill={sel ? '#8C3E1A' : '#C96A3A'} stroke="white" strokeWidth={sel ? 2.5 : 2} />
             </g>
           );
         })}
-
         {tip && (
-          <g style={{ pointerEvents: 'none' }}>
-            <rect x={tipX - TW/2} y={tipY} width={TW} height={TH} rx={8}
+          <g style={{ pointerEvents:'none' }}>
+            <rect x={tipX-TW/2} y={tipY} width={TW} height={TH} rx={8}
               fill="white" stroke="#EDD9C5" strokeWidth="1.5" />
-            <text x={tipX} y={tipY + 16} textAnchor="middle" fontSize="10" fill="#6B4E38"
+            <text x={tipX} y={tipY+16} textAnchor="middle" fontSize="10" fill="#6B4E38"
               fontFamily="Nunito, sans-serif" fontWeight="600">{formatDate(tip.date)}</text>
-            <text x={tipX} y={tipY + 33} textAnchor="middle" fontSize="13" fill="#C96A3A"
+            <text x={tipX} y={tipY+33} textAnchor="middle" fontSize="13" fill="#C96A3A"
               fontFamily="Nunito, sans-serif" fontWeight="800">{tip.lbs} lbs · {tip.src}</text>
           </g>
         )}
@@ -736,7 +771,6 @@ function BottomSheet({ title, onClose, children }) {
 
 // ─── MultiCareSheet (flea / nails) ────────────────────────────────────────────
 function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClearAll, saving }) {
-  const cfg = CARE_CONFIG[type];
   const [dateVal,      setDateVal]      = useState(todayISO());
   const [selected,     setSelected]     = useState([defaultCatId]);
   const [feedback,     setFeedback]     = useState('');
@@ -746,7 +780,6 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
     setFeedback('');
   }
-
   function handleLog() {
     if (!dateVal || selected.length === 0) return;
     const alreadyLogged = selected.filter(id =>
@@ -754,26 +787,22 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
     );
     const toLog = selected.filter(id => !alreadyLogged.includes(id));
     if (toLog.length === 0) {
-      const names = alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ');
-      setFeedback(`Already logged for ${names} on this date.`);
+      setFeedback(`Already logged for ${alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ')} on this date.`);
       return;
     }
-    if (alreadyLogged.length > 0) {
-      const names = alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ');
-      setFeedback(`Skipped ${names} — already logged for this date.`);
-    } else { setFeedback(''); }
+    if (alreadyLogged.length > 0)
+      setFeedback(`Skipped ${alreadyLogged.map(id => CATS.find(c => c.id === id).name).join(', ')} — already logged.`);
+    else setFeedback('');
     onLog(type, dateVal, toLog);
   }
 
   const byDate = {};
-  for (const cat of CATS) {
+  for (const cat of CATS)
     for (const e of (catState[cat.id]?.data?.[type] || [])) {
       if (!byDate[e.date]) byDate[e.date] = new Set();
       byDate[e.date].add(cat.id);
     }
-  }
-  const grouped = Object.entries(byDate)
-    .sort(([a], [b]) => b.localeCompare(a))
+  const grouped = Object.entries(byDate).sort(([a],[b]) => b.localeCompare(a))
     .map(([date, catIdSet]) => ({ date, catIds: catIdSet }));
   const totalEntries = grouped.reduce((sum, g) => sum + g.catIds.size, 0);
 
@@ -786,10 +815,9 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
         <div className="wl-section-label">Apply to</div>
         <div className="wl-cat-toggles">
           {CATS.map(cat => {
-            const on     = selected.includes(cat.id);
-            const loaded = catState[cat.id]?.status === 'loaded';
+            const on = selected.includes(cat.id), loaded = catState[cat.id]?.status === 'loaded';
             return (
-              <button key={cat.id} className={`wl-cat-toggle${on ? ' on' : ''}`}
+              <button key={cat.id} className={`wl-cat-toggle${on?' on':''}`}
                 onClick={() => toggleCat(cat.id)} disabled={!loaded}>
                 {on && <span className="wl-toggle-check">✓</span>}{cat.name}
               </button>
@@ -802,9 +830,7 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
             {saving ? '…' : 'Log'}
           </button>
         </div>
-        <div className={`wl-log-feedback${feedback ? ' error' : ''}`}>
-          {saving ? 'Saving…' : feedback}
-        </div>
+        <div className={`wl-log-feedback${feedback?' error':''}`}>{saving ? 'Saving…' : feedback}</div>
       </div>
 
       <div className="wl-section-label">History ({totalEntries} entries)</div>
@@ -827,27 +853,22 @@ function MultiCareSheet({ type, defaultCatId, catState, onLog, onDelete, onClear
                 </td>
                 {CATS.map(cat => catIds.has(cat.id) ? (
                   <td key={cat.id} className="wl-hist-cat-cell">
-                    <button className="wl-hist-check-btn"
-                      onClick={() => onDelete(type, date, cat.id)}>✓</button>
+                    <button className="wl-hist-check-btn" onClick={() => onDelete(type, date, cat.id)}>✓</button>
                   </td>
                 ) : (
-                  <td key={cat.id} className="wl-hist-cat-cell">
-                    <span className="wl-hist-dash">—</span>
-                  </td>
+                  <td key={cat.id} className="wl-hist-cat-cell"><span className="wl-hist-dash">—</span></td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
       )}
-
       {totalEntries > 0 && (
         <div className="wl-clear-section">
           {confirmClear ? (
             <div className="wl-clear-confirm">
               <span className="wl-clear-confirm-text">Remove all {totalEntries} entries?</span>
-              <button className="wl-clear-yes"
-                onClick={() => { onClearAll(type); setConfirmClear(false); }}>Yes, clear</button>
+              <button className="wl-clear-yes" onClick={() => { onClearAll(type); setConfirmClear(false); }}>Yes, clear</button>
               <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
             </div>
           ) : (
@@ -892,15 +913,12 @@ function VetSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
           {status.flagged.map(item => (
             <div key={item.label} className="wl-vet-overdue-item">
               <span>⚠️</span>
-              <span>{item.label}: {item.days === null
-                ? 'never logged'
-                : `${Math.floor(item.days/30)} months ago — ${status.color === 'amber' ? 'due soon' : 'overdue'}`}
-              </span>
+              <span>{item.label}: {item.days === null ? 'never logged'
+                : `${Math.floor(item.days/30)} months ago — ${status.color==='amber'?'due soon':'overdue'}`}</span>
             </div>
           ))}
         </div>
       )}
-
       <div className="wl-log-section">
         <div className="wl-section-label">Date</div>
         <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
@@ -956,7 +974,6 @@ function VetSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
           </div>
         );
       })}
-
       {sorted.length > 0 && (
         <div className="wl-clear-section">
           {confirmClear ? (
@@ -989,13 +1006,11 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
     onAdd({ id: Date.now().toString(), date: dateVal, lbs, src });
     setLbsVal(''); setDateVal(todayISO()); setSrc('Home');
   }
-
   const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <>
       <WeightChart entries={entries} />
-
       <div className="wl-log-section">
         <div className="wl-section-label">Date</div>
         <input type="date" className="wl-date-input" value={dateVal} max={todayISO()}
@@ -1009,16 +1024,14 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
         </div>
         <div className="wl-section-label">Source</div>
         <div className="wl-cat-toggles" style={{ marginBottom: 0 }}>
-          {['Home', 'Vet'].map(s => (
-            <button key={s} className={`wl-cat-toggle${src === s ? ' on' : ''}`}
-              onClick={() => setSrc(s)}>
+          {['Home','Vet'].map(s => (
+            <button key={s} className={`wl-cat-toggle${src===s?' on':''}`} onClick={() => setSrc(s)}>
               {src === s && <span className="wl-toggle-check">✓</span>}{s}
             </button>
           ))}
         </div>
         <div className="wl-log-row-end">
-          <button className="wl-log-btn" onClick={handleLog}
-            disabled={!dateVal || !lbsVal || saving}>
+          <button className="wl-log-btn" onClick={handleLog} disabled={!dateVal || !lbsVal || saving}>
             {saving ? '…' : 'Log Weight'}
           </button>
         </div>
@@ -1052,7 +1065,6 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
           </tbody>
         </table>
       )}
-
       {sorted.length > 0 && (
         <div className="wl-clear-section">
           {confirmClear ? (
@@ -1070,13 +1082,196 @@ function WeightSheet({ catData, onAdd, onDelete, onClearAll, saving }) {
   );
 }
 
+// ─── JournalSheet ─────────────────────────────────────────────────────────────
+function JournalSheet({ catData, onAdd, onUpdate, onDelete, onClearAll, saving }) {
+  const entries = catData?.journal || [];
+
+  // New entry form
+  const [newDate,  setNewDate]  = useState(todayISO());
+  const [newText,  setNewText]  = useState('');
+  const newTextRef = useRef(null);
+
+  // Card state
+  const [expandedId,      setExpandedId]      = useState(null);
+  const [editingId,       setEditingId]        = useState(null);
+  const [editDate,        setEditDate]         = useState('');
+  const [editText,        setEditText]         = useState('');
+  const [confirmDeleteId, setConfirmDeleteId]  = useState(null);
+  const [confirmClear,    setConfirmClear]     = useState(false);
+  const editTextRef = useRef(null);
+
+  // Auto-expand new entry textarea
+  useEffect(() => {
+    if (newTextRef.current) {
+      newTextRef.current.style.height = 'auto';
+      newTextRef.current.style.height = newTextRef.current.scrollHeight + 'px';
+    }
+  }, [newText]);
+
+  // Auto-expand edit textarea
+  useEffect(() => {
+    if (editTextRef.current) {
+      editTextRef.current.style.height = 'auto';
+      editTextRef.current.style.height = editTextRef.current.scrollHeight + 'px';
+    }
+  }, [editText]);
+
+  function handleAdd() {
+    if (!newDate || !newText.trim()) return;
+    onAdd({ id: Date.now().toString(), date: newDate, text: newText.trim() });
+    setNewDate(todayISO()); setNewText('');
+  }
+
+  function handleStartEdit(entry) {
+    setEditingId(entry.id);
+    setEditDate(entry.date);
+    setEditText(entry.text);
+    setExpandedId(entry.id);
+    setConfirmDeleteId(null);
+  }
+
+  function handleSave(entryId) {
+    if (!editDate || !editText.trim()) return;
+    onUpdate(entryId, { date: editDate, text: editText.trim() });
+    setEditingId(null); setEditDate(''); setEditText('');
+  }
+
+  function handleCancelEdit() {
+    setEditingId(null); setEditDate(''); setEditText('');
+  }
+
+  function toggleExpand(id) {
+    if (editingId === id) return; // don't collapse while editing
+    setExpandedId(prev => prev === id ? null : id);
+    setConfirmDeleteId(null);
+  }
+
+  const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
+
+  return (
+    <>
+      {/* ── New entry form ── */}
+      <div className="wl-log-section">
+        <div className="wl-section-label">New Entry</div>
+        <input type="date" className="wl-date-input" value={newDate} max={todayISO()}
+          onChange={e => setNewDate(e.target.value)} />
+        <textarea ref={newTextRef} className="wl-notes-input" value={newText} rows={3}
+          placeholder="What's going on with your cat today?"
+          onChange={e => setNewText(e.target.value)} />
+        <div className="wl-log-row-end">
+          <button className="wl-log-btn" onClick={handleAdd}
+            disabled={!newDate || !newText.trim() || saving}>
+            {saving ? '…' : 'Add Entry'}
+          </button>
+        </div>
+        {saving && <div className="wl-log-feedback">Saving…</div>}
+      </div>
+
+      {/* ── History ── */}
+      <div className="wl-section-label">
+        Entries ({sorted.length})
+      </div>
+
+      {sorted.length === 0 ? (
+        <div className="wl-history-empty">No entries yet — add the first one above!</div>
+      ) : sorted.map(entry => {
+        const isExpanded   = expandedId      === entry.id;
+        const isEditing    = editingId       === entry.id;
+        const isConfirming = confirmDeleteId === entry.id;
+        const days         = getDaysSince(entry.date);
+
+        return (
+          <div key={entry.id} className="wl-journal-card"
+            onClick={() => toggleExpand(entry.id)}>
+
+            {/* Always-visible header */}
+            <div className="wl-journal-card-header">
+              <div>
+                <div className="wl-journal-date">{formatDate(entry.date)}</div>
+                <div className="wl-journal-ago">{longDaysLabel(days)}</div>
+              </div>
+              {!isEditing && (
+                <span className={`wl-journal-chevron${isExpanded ? ' open' : ''}`}>›</span>
+              )}
+            </div>
+
+            {/* Expanded: text + actions */}
+            {isExpanded && !isEditing && (
+              <>
+                <div className="wl-journal-text">{entry.text}</div>
+                {!isConfirming && (
+                  <div className="wl-journal-actions">
+                    <button className="wl-journal-edit-btn"
+                      onClick={e => { e.stopPropagation(); handleStartEdit(entry); }}>
+                      Edit
+                    </button>
+                    <button className="wl-journal-delete-btn"
+                      onClick={e => { e.stopPropagation(); setConfirmDeleteId(entry.id); }}>
+                      Delete
+                    </button>
+                  </div>
+                )}
+                {isConfirming && (
+                  <div className="wl-vet-confirm-row" onClick={e => e.stopPropagation()}>
+                    <span className="wl-vet-confirm-text">Remove this entry?</span>
+                    <div className="wl-vet-confirm-btns">
+                      <button className="wl-vet-confirm-no"
+                        onClick={() => setConfirmDeleteId(null)}>Cancel</button>
+                      <button className="wl-vet-confirm-yes"
+                        onClick={() => { onDelete(entry.id); setConfirmDeleteId(null); }}>Delete</button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Edit mode */}
+            {isEditing && (
+              <div className="wl-journal-edit-form" onClick={e => e.stopPropagation()}>
+                <input type="date" className="wl-date-input"
+                  style={{ marginTop: 10, marginBottom: 10 }}
+                  value={editDate} max={todayISO()}
+                  onChange={e => setEditDate(e.target.value)} />
+                <textarea ref={editTextRef} className="wl-notes-input" value={editText} rows={3}
+                  onChange={e => setEditText(e.target.value)} />
+                <div className="wl-journal-edit-actions">
+                  <button className="wl-journal-cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                  <button className="wl-journal-save-btn"
+                    onClick={() => handleSave(entry.id)}
+                    disabled={!editDate || !editText.trim() || saving}>
+                    {saving ? '…' : 'Save'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* ── Clear all ── */}
+      {sorted.length > 0 && (
+        <div className="wl-clear-section">
+          {confirmClear ? (
+            <div className="wl-clear-confirm">
+              <span className="wl-clear-confirm-text">Remove all {sorted.length} entries?</span>
+              <button className="wl-clear-yes" onClick={() => { onClearAll(); setConfirmClear(false); }}>Yes, clear</button>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
+            </div>
+          ) : (
+            <button className="wl-clear-btn" onClick={() => setConfirmClear(true)}>Clear all entries</button>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
 // ─── CatSelector ──────────────────────────────────────────────────────────────
 function CatSelector({ activeCatId, onSelect, catData }) {
   return (
     <div className="wl-cat-selector">
       {CATS.map(cat => (
-        <div key={cat.id}
-          className={`wl-cat-card${activeCatId === cat.id ? ' active' : ''}`}
+        <div key={cat.id} className={`wl-cat-card${activeCatId===cat.id?' active':''}`}
           onClick={() => onSelect(cat.id)}>
           <CatAvatar photo={catData[cat.id]?.photo ?? null} />
           <div className="wl-cat-name">{cat.name}</div>
@@ -1101,20 +1296,11 @@ function CatsSection({ catId, data, onOpenSheet }) {
           <div className="wl-profile-breed">{cat.breed} · {cat.size}</div>
         </div>
       </div>
-
-      <CareCard       type="flea"  entries={data?.flea   ?? []} onTap={() => onOpenSheet('flea',   catId)} />
-      <CareCard       type="nails" entries={data?.nails  ?? []} onTap={() => onOpenSheet('nails',  catId)} />
-      <VetCareCard                 entries={data?.vet    ?? []} onTap={() => onOpenSheet('vet',    catId)} />
-      <WeightCareCard              entries={data?.weight ?? []} onTap={() => onOpenSheet('weight', catId)} />
-
-      <div className="wl-placeholder-section">
-        <div className="wl-placeholder-icon">📝</div>
-        <div>
-          <div className="wl-placeholder-label">Health Journal</div>
-          <div className="wl-placeholder-sub">Notes & observations</div>
-        </div>
-        <div className="wl-coming-badge">Coming soon</div>
-      </div>
+      <CareCard       type="flea"  entries={data?.flea    ?? []} onTap={() => onOpenSheet('flea',    catId)} />
+      <CareCard       type="nails" entries={data?.nails   ?? []} onTap={() => onOpenSheet('nails',   catId)} />
+      <VetCareCard                 entries={data?.vet     ?? []} onTap={() => onOpenSheet('vet',     catId)} />
+      <WeightCareCard              entries={data?.weight  ?? []} onTap={() => onOpenSheet('weight',  catId)} />
+      <JournalCareCard             entries={data?.journal ?? []} onTap={() => onOpenSheet('journal', catId)} />
     </div>
   );
 }
@@ -1162,16 +1348,15 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    CATS.forEach(cat => loadCat(cat.id));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { CATS.forEach(cat => loadCat(cat.id)); }, []); // eslint-disable-line
 
+  // ── Flea / nails ──────────────────────────────────────────────────────────
   const handleMultiLog = useCallback(async (type, date, catIds) => {
     const cs = catStateRef.current;
     const updates = catIds.map(id => {
       const data = cs[id]?.data;
       if (!data) return null;
-      return { id, data: { ...data, [type]: [...(data[type] || []), { date }] } };
+      return { id, data: { ...data, [type]: [...(data[type]||[]), { date }] } };
     }).filter(Boolean);
     if (updates.length === 0) return;
     setCatState(prev => {
@@ -1181,18 +1366,18 @@ function App() {
     });
     setSaving(true);
     try { await Promise.all(updates.map(({ id, data }) => saveCat(id, data))); }
-    catch (err) { console.error('Multi-save failed:', err); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
   const handleDelete = useCallback(async (type, date, catId) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
-    const updated = { ...data, [type]: (data[type] || []).filter(e => e.date !== date) };
+    const updated = { ...data, [type]: (data[type]||[]).filter(e => e.date !== date) };
     setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
-    catch (err) { console.error('Delete failed:', err); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
@@ -1211,29 +1396,41 @@ function App() {
     });
     setSaving(true);
     try { await Promise.all(updates.map(({ id, data }) => saveCat(id, data))); }
-    catch (err) { console.error('Clear failed:', err); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
+  // ── Generic per-cat handlers ───────────────────────────────────────────────
   const handleAddEntry = useCallback(async (catId, field, entry) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
-    const updated = { ...data, [field]: [...(data[field] || []), entry] };
+    const updated = { ...data, [field]: [...(data[field]||[]), entry] };
     setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
-    catch (err) { console.error('Add entry failed:', err); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
   const handleDeleteEntry = useCallback(async (catId, field, entryId) => {
     const data = catStateRef.current[catId]?.data;
     if (!data) return;
-    const updated = { ...data, [field]: (data[field] || []).filter(e => e.id !== entryId) };
+    const updated = { ...data, [field]: (data[field]||[]).filter(e => e.id !== entryId) };
     setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
-    catch (err) { console.error('Delete entry failed:', err); }
+    catch (err) { console.error(err); }
+    finally { setSaving(false); }
+  }, []);
+
+  const handleUpdateEntry = useCallback(async (catId, field, entryId, updates) => {
+    const data = catStateRef.current[catId]?.data;
+    if (!data) return;
+    const updated = { ...data, [field]: (data[field]||[]).map(e => e.id === entryId ? { ...e, ...updates } : e) };
+    setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
+    setSaving(true);
+    try { await saveCat(catId, updated); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
@@ -1244,7 +1441,7 @@ function App() {
     setCatState(prev => ({ ...prev, [catId]: { ...prev[catId], data: updated } }));
     setSaving(true);
     try { await saveCat(catId, updated); }
-    catch (err) { console.error('Clear field failed:', err); }
+    catch (err) { console.error(err); }
     finally { setSaving(false); }
   }, []);
 
@@ -1253,8 +1450,9 @@ function App() {
   const catName    = CATS.find(c => c.id === openSheet?.catId)?.name ?? '';
 
   const sheetTitle = openSheet
-    ? openSheet.type === 'vet'    ? `🏥 Vet Visits — ${catName}`
-    : openSheet.type === 'weight' ? `⚖️ Weight — ${catName}`
+    ? openSheet.type === 'vet'     ? `🏥 Vet Visits — ${catName}`
+    : openSheet.type === 'weight'  ? `⚖️ Weight — ${catName}`
+    : openSheet.type === 'journal' ? `📝 Health Journal — ${catName}`
     : `${CARE_CONFIG[openSheet.type].icon} ${CARE_CONFIG[openSheet.type].label}`
     : '';
 
@@ -1274,7 +1472,6 @@ function App() {
         {activeTab === 'cats' && (
           <CatSelector activeCatId={activeCatId} onSelect={setActiveCatId} catData={catDataMap} />
         )}
-
         {activeTab === 'cats' && (
           <>
             {status === 'loading' && (
@@ -1298,17 +1495,14 @@ function App() {
             {status === 'idle' && <div className="wl-state"><div className="wl-spinner" /></div>}
           </>
         )}
-
         {activeTab === 'diary' && <DiarySection />}
       </div>
 
       <nav className="wl-bottom-nav">
-        <button className={`wl-nav-tab${activeTab === 'cats' ? ' active' : ''}`}
-          onClick={() => setActiveTab('cats')}>
+        <button className={`wl-nav-tab${activeTab==='cats'?' active':''}`} onClick={() => setActiveTab('cats')}>
           <span className="wl-nav-tab-icon">🐾</span>CATS
         </button>
-        <button className={`wl-nav-tab${activeTab === 'diary' ? ' active' : ''}`}
-          onClick={() => setActiveTab('diary')}>
+        <button className={`wl-nav-tab${activeTab==='diary'?' active':''}`} onClick={() => setActiveTab('diary')}>
           <span className="wl-nav-tab-icon">📓</span>DIARY
         </button>
       </nav>
@@ -1318,7 +1512,7 @@ function App() {
           {openSheet.type === 'vet' ? (
             <VetSheet
               catData={catState[openSheet.catId]?.data}
-              onAdd={entry => handleAddEntry(openSheet.catId, 'vet', entry)}
+              onAdd={entry  => handleAddEntry(openSheet.catId, 'vet', entry)}
               onDelete={id  => handleDeleteEntry(openSheet.catId, 'vet', id)}
               onClearAll={() => handleClearField(openSheet.catId, 'vet')}
               saving={saving}
@@ -1326,9 +1520,18 @@ function App() {
           ) : openSheet.type === 'weight' ? (
             <WeightSheet
               catData={catState[openSheet.catId]?.data}
-              onAdd={entry => handleAddEntry(openSheet.catId, 'weight', entry)}
+              onAdd={entry  => handleAddEntry(openSheet.catId, 'weight', entry)}
               onDelete={id  => handleDeleteEntry(openSheet.catId, 'weight', id)}
               onClearAll={() => handleClearField(openSheet.catId, 'weight')}
+              saving={saving}
+            />
+          ) : openSheet.type === 'journal' ? (
+            <JournalSheet
+              catData={catState[openSheet.catId]?.data}
+              onAdd={entry            => handleAddEntry(openSheet.catId, 'journal', entry)}
+              onUpdate={(id, updates) => handleUpdateEntry(openSheet.catId, 'journal', id, updates)}
+              onDelete={id            => handleDeleteEntry(openSheet.catId, 'journal', id)}
+              onClearAll={()          => handleClearField(openSheet.catId, 'journal')}
               saving={saving}
             />
           ) : (
