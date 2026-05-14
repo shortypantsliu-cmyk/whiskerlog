@@ -151,8 +151,16 @@ const styles = `
     box-shadow: 0 2px 8px rgba(0,0,0,.15);
   }
   .wl-header-icon  { font-size: 28px; flex-shrink: 0; line-height: 1; }
+  .wl-header-text  { flex: 1; min-width: 0; }
   .wl-header-title { font-weight: 800; font-size: 17px; line-height: 1.1; }
   .wl-header-sub   { font-size: 13px; opacity: .85; margin-top: 1px; }
+  .wl-header-settings {
+    background: none; border: none; color: white;
+    font-size: 20px; padding: 4px; opacity: .85;
+    flex-shrink: 0; line-height: 1;
+    transition: opacity .12s;
+  }
+  .wl-header-settings:active { opacity: 1; }
 
   /* ── CAT SELECTOR ── */
   .wl-cat-selector {
@@ -268,8 +276,7 @@ const styles = `
   /* ── CROP MODAL ── */
   .wl-crop-modal {
     position: fixed; inset: 0; z-index: 50;
-    background: #111;
-    display: flex; flex-direction: column;
+    background: #111; display: flex; flex-direction: column;
   }
   .wl-crop-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -278,18 +285,9 @@ const styles = `
     background: rgba(0,0,0,.75); flex-shrink: 0; gap: 12px;
   }
   .wl-crop-title   { font-size: 15px; font-weight: 700; color: white; flex: 1; text-align: center; }
-  .wl-crop-cancel  {
-    background: none; border: none; color: rgba(255,255,255,.7);
-    font-size: 15px; font-weight: 600; padding: 6px; white-space: nowrap;
-  }
-  .wl-crop-confirm {
-    background: #C96A3A; color: white; border: none;
-    border-radius: 20px; padding: 8px 20px;
-    font-size: 15px; font-weight: 700; white-space: nowrap;
-  }
-  .wl-crop-body { flex: 1; overflow: hidden; }
-
-  /* Make Cropper.js crop box appear circular */
+  .wl-crop-cancel  { background: none; border: none; color: rgba(255,255,255,.7); font-size: 15px; font-weight: 600; padding: 6px; white-space: nowrap; }
+  .wl-crop-confirm { background: #C96A3A; color: white; border: none; border-radius: 20px; padding: 8px 20px; font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .wl-crop-body    { flex: 1; overflow: hidden; }
   .cropper-view-box,
   .cropper-face { border-radius: 50%; }
 
@@ -326,6 +324,22 @@ const styles = `
     overflow-y: auto; flex: 1; padding: 18px 16px;
     padding-bottom: calc(18px + env(safe-area-inset-bottom));
   }
+
+  /* ── SETTINGS SHEET ── */
+  .wl-settings-section { margin-bottom: 8px; }
+  .wl-settings-row {
+    width: 100%; display: flex; align-items: center; gap: 14px;
+    background: #FDF8F0; border: 1px solid rgba(220,170,130,.25);
+    border-radius: 12px; padding: 14px 16px;
+    cursor: pointer; text-align: left; transition: background .1s;
+    margin-bottom: 8px;
+  }
+  .wl-settings-row:active { background: #FAF2E8; }
+  .wl-settings-row-icon  { font-size: 24px; flex-shrink: 0; line-height: 1; }
+  .wl-settings-row-body  { flex: 1; min-width: 0; }
+  .wl-settings-row-label { font-size: 15px; font-weight: 700; color: #3D2010; }
+  .wl-settings-row-desc  { font-size: 13px; color: #9E8070; margin-top: 2px; }
+  .wl-settings-row-check { font-size: 18px; color: #2AB25B; font-weight: 800; flex-shrink: 0; }
 
   /* ── SHARED FORM ELEMENTS ── */
   .wl-log-section { margin-bottom: 22px; }
@@ -584,47 +598,27 @@ function StatusBadge({ color, label }) {
 }
 
 // ─── CropModal ────────────────────────────────────────────────────────────────
-// Full-screen crop UI using Cropper.js (loaded from CDN in index.html).
-// Receives the raw File, manages its own object URL lifecycle, returns a
-// 400×400 JPEG base64 string via onConfirm.
 function CropModal({ file, onConfirm, onCancel }) {
   const imgRef     = useRef(null);
   const cropperRef = useRef(null);
 
   useEffect(() => {
     if (!imgRef.current || !window.Cropper) return;
-
     const url = URL.createObjectURL(file);
     imgRef.current.src = url;
-
     const cropper = new window.Cropper(imgRef.current, {
-      aspectRatio:              1,       // square → circle
-      viewMode:                 1,       // crop box stays within image
-      dragMode:                 'move',  // drag moves image, not crop box
-      autoCropArea:             0.85,    // crop circle = 85% of container
-      cropBoxMovable:           false,   // fixed crop box — user moves image
-      cropBoxResizable:         false,
-      toggleDragModeOnDblclick: false,
-      background:               false,
-      guides:                   false,
-      center:                   false,
-      highlight:                false,
+      aspectRatio: 1, viewMode: 1, dragMode: 'move', autoCropArea: 0.85,
+      cropBoxMovable: false, cropBoxResizable: false,
+      toggleDragModeOnDblclick: false, background: false, guides: false, center: false, highlight: false,
     });
     cropperRef.current = cropper;
-
-    return () => {
-      cropper.destroy();
-      URL.revokeObjectURL(url);
-    };
+    return () => { cropper.destroy(); URL.revokeObjectURL(url); };
   }, [file]);
 
   function handleConfirm() {
     if (!cropperRef.current) return;
     const canvas = cropperRef.current.getCroppedCanvas({
-      width:                 400,
-      height:                400,
-      imageSmoothingEnabled: true,
-      imageSmoothingQuality: 'high',
+      width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high',
     });
     onConfirm(canvas.toDataURL('image/jpeg', 0.85));
   }
@@ -637,9 +631,50 @@ function CropModal({ file, onConfirm, onCancel }) {
         <button className="wl-crop-confirm" onClick={handleConfirm}>Use Photo</button>
       </div>
       <div className="wl-crop-body">
-        {/* Cropper.js attaches itself to this img element */}
         <img ref={imgRef} alt="crop preview" style={{ display: 'block', maxWidth: '100%' }} />
       </div>
+    </div>
+  );
+}
+
+// ─── SettingsSheet ────────────────────────────────────────────────────────────
+function SettingsSheet({ catState }) {
+  const [exported, setExported] = useState(false);
+
+  function handleExport() {
+    const payload = {
+      exportDate:  todayISO(),
+      appVersion:  APP_VERSION,
+      cats: Object.fromEntries(
+        CATS.map(cat => [cat.id, catState[cat.id]?.data ?? null])
+      ),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `whiskerlog-backup-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setExported(true);
+    setTimeout(() => setExported(false), 3000);
+  }
+
+  return (
+    <div className="wl-settings-section">
+      <div className="wl-section-label">Data</div>
+      <button className="wl-settings-row" onClick={handleExport}>
+        <div className="wl-settings-row-icon">📤</div>
+        <div className="wl-settings-row-body">
+          <div className="wl-settings-row-label">Export All Data</div>
+          <div className="wl-settings-row-desc">
+            Download a JSON backup of all three cats
+          </div>
+        </div>
+        {exported && <span className="wl-settings-row-check">✓</span>}
+      </button>
     </div>
   );
 }
@@ -735,29 +770,27 @@ function WeightChart({ entries }) {
   const [tooltip, setTooltip] = useState(null);
   if (!entries || entries.length === 0)
     return <div className="wl-chart-empty">No weight data yet — log the first entry below.</div>;
-
-  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
-  const W = 340, H = 140, PAD = { l:36, r:10, t:16, b:28 };
-  const pw = W-PAD.l-PAD.r, ph = H-PAD.t-PAD.b;
-  const toMs  = (iso) => new Date(iso+'T12:00:00').getTime();
-  const tsArr = sorted.map(e => toMs(e.date));
-  const minTs = tsArr[0], maxTs = tsArr[tsArr.length-1], tsSpan = maxTs-minTs||1;
-  const xOf   = (iso) => sorted.length===1 ? PAD.l+pw/2 : PAD.l+((toMs(iso)-minTs)/tsSpan)*pw;
-  const lbsArr = sorted.map(e => parseFloat(e.lbs));
-  const dMin = Math.min(...lbsArr), dMax = Math.max(...lbsArr);
-  const pad  = (dMax-dMin||1)*0.2, yMin = dMin-pad, yMax = dMax+pad;
-  const yOf  = (lbs) => PAD.t+ph-((lbs-yMin)/(yMax-yMin))*ph;
-  const yLabels = Array.from({length:4},(_,i)=>(+(yMin+(yMax-yMin)*(i/3)).toFixed(1)));
-  const spanDays = (maxTs-minTs)/86400000;
-  const xFmt = (iso) => { const[y,m,d]=iso.split('-').map(Number); const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]; return spanDays>180?`${mn} '${String(y).slice(2)}`:`${mn} ${d}`; };
-  const xLabelIdxs = sorted.length===1?[0]:sorted.length===2?[0,1]:[0,Math.floor((sorted.length-1)/2),sorted.length-1];
-  const ptStr = sorted.map(e=>`${xOf(e.date).toFixed(1)},${yOf(e.lbs).toFixed(1)}`).join(' ');
-  const TW=114, TH=44;
+  const sorted=[...entries].sort((a,b)=>a.date.localeCompare(b.date));
+  const W=340,H=140,PAD={l:36,r:10,t:16,b:28};
+  const pw=W-PAD.l-PAD.r,ph=H-PAD.t-PAD.b;
+  const toMs=(iso)=>new Date(iso+'T12:00:00').getTime();
+  const tsArr=sorted.map(e=>toMs(e.date));
+  const minTs=tsArr[0],maxTs=tsArr[tsArr.length-1],tsSpan=maxTs-minTs||1;
+  const xOf=(iso)=>sorted.length===1?PAD.l+pw/2:PAD.l+((toMs(iso)-minTs)/tsSpan)*pw;
+  const lbsArr=sorted.map(e=>parseFloat(e.lbs));
+  const dMin=Math.min(...lbsArr),dMax=Math.max(...lbsArr);
+  const pad=(dMax-dMin||1)*0.2,yMin=dMin-pad,yMax=dMax+pad;
+  const yOf=(lbs)=>PAD.t+ph-((lbs-yMin)/(yMax-yMin))*ph;
+  const yLabels=Array.from({length:4},(_,i)=>(+(yMin+(yMax-yMin)*(i/3)).toFixed(1)));
+  const spanDays=(maxTs-minTs)/86400000;
+  const xFmt=(iso)=>{const[y,m,d]=iso.split('-').map(Number);const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1];return spanDays>180?`${mn} '${String(y).slice(2)}`:`${mn} ${d}`;};
+  const xLabelIdxs=sorted.length===1?[0]:sorted.length===2?[0,1]:[0,Math.floor((sorted.length-1)/2),sorted.length-1];
+  const ptStr=sorted.map(e=>`${xOf(e.date).toFixed(1)},${yOf(e.lbs).toFixed(1)}`).join(' ');
+  const TW=114,TH=44;
   function handleDot(e,entry){e.stopPropagation();setTooltip(prev=>prev?.date===entry.date?null:entry);}
-  const tip=tooltip; let tipX=0,tipY=0;
+  const tip=tooltip;let tipX=0,tipY=0;
   if(tip){tipX=Math.max(TW/2+2,Math.min(W-TW/2-2,xOf(tip.date)));const dy=yOf(tip.lbs);tipY=dy>TH+20?dy-TH-12:dy+14;}
-
-  return (
+  return(
     <div className="wl-chart-wrap">
       <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',display:'block'}} onClick={()=>setTooltip(null)}>
         <rect x={0} y={0} width={W} height={H} fill="transparent"/>
@@ -773,8 +806,8 @@ function WeightChart({ entries }) {
 
 // ─── BottomSheet ──────────────────────────────────────────────────────────────
 function BottomSheet({ title, onClose, children }) {
-  useEffect(() => { document.body.style.overflow='hidden'; return()=>{ document.body.style.overflow=''; }; }, []);
-  return (
+  useEffect(()=>{document.body.style.overflow='hidden';return()=>{document.body.style.overflow='';};}, []);
+  return(
     <div className="wl-sheet-backdrop" onClick={onClose}>
       <div className="wl-sheet" onClick={e=>e.stopPropagation()}>
         <div className="wl-sheet-handle-wrap"><div className="wl-sheet-handle"/></div>
@@ -955,17 +988,15 @@ function CatSelector({ activeCatId, onSelect, catData }) {
 function CatsSection({ catId, data, onOpenSheet, onPhotoUpload }) {
   const cat          = CATS.find(c => c.id === catId);
   const fileInputRef = useRef(null);
-  const [cropFile,  setCropFile]  = useState(null);  // File awaiting crop
+  const [cropFile,  setCropFile]  = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  // Step 1: file picked → open crop modal
   function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (file) setCropFile(file);
-    e.target.value = ''; // reset so same file can be re-selected
+    e.target.value = '';
   }
 
-  // Step 2: crop confirmed → save to blob
   async function handleCropConfirm(base64) {
     setCropFile(null);
     setUploading(true);
@@ -977,22 +1008,14 @@ function CatsSection({ catId, data, onOpenSheet, onPhotoUpload }) {
   return (
     <div className="wl-content">
       <div className="wl-profile-card">
-
-        {/* Tappable avatar with camera badge */}
         <div className="wl-profile-avatar-wrap" onClick={() => fileInputRef.current?.click()}>
           <div className="wl-profile-avatar">
             {data?.photo ? <img src={data.photo} alt={cat.name} /> : '🐱'}
-            {uploading && (
-              <div className="wl-avatar-uploading"><div className="wl-spinner-sm"/></div>
-            )}
+            {uploading && <div className="wl-avatar-uploading"><div className="wl-spinner-sm"/></div>}
           </div>
           {!uploading && <div className="wl-avatar-camera-badge">📷</div>}
         </div>
-
-        {/* Hidden file input */}
-        <input ref={fileInputRef} type="file" accept="image/*"
-          style={{ display: 'none' }} onChange={handleFileChange} />
-
+        <input ref={fileInputRef} type="file" accept="image/*" style={{display:'none'}} onChange={handleFileChange}/>
         <div>
           <div className="wl-profile-name">{cat.name}</div>
           <div className="wl-profile-breed">{cat.breed} · {cat.size}</div>
@@ -1005,13 +1028,8 @@ function CatsSection({ catId, data, onOpenSheet, onPhotoUpload }) {
       <WeightCareCard              entries={data?.weight  ?? []} onTap={() => onOpenSheet('weight',  catId)} />
       <JournalCareCard             entries={data?.journal ?? []} onTap={() => onOpenSheet('journal', catId)} />
 
-      {/* Crop modal — full screen, shown after file selection */}
       {cropFile && (
-        <CropModal
-          file={cropFile}
-          onConfirm={handleCropConfirm}
-          onCancel={() => setCropFile(null)}
-        />
+        <CropModal file={cropFile} onConfirm={handleCropConfirm} onCancel={() => setCropFile(null)} />
       )}
     </div>
   );
@@ -1024,9 +1042,7 @@ function DiarySection() {
       <div className="wl-diary-placeholder">
         <div className="wl-diary-placeholder-icon">📓</div>
         <div className="wl-diary-placeholder-title">Household Diary</div>
-        <div className="wl-diary-placeholder-sub">
-          A shared journal for all three cats — notes, observations, and daily life.
-        </div>
+        <div className="wl-diary-placeholder-sub">A shared journal for all three cats — notes, observations, and daily life.</div>
         <div className="wl-diary-badge">Coming in v2.0</div>
       </div>
     </div>
@@ -1035,10 +1051,11 @@ function DiarySection() {
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function App() {
-  const [activeTab,    setActiveTab]   = useState('cats');
-  const [activeCatId, setActiveCatId] = useState('pip');
-  const [openSheet,   setOpenSheet]   = useState(null);
-  const [saving,      setSaving]      = useState(false);
+  const [activeTab,     setActiveTab]    = useState('cats');
+  const [activeCatId,  setActiveCatId]  = useState('pip');
+  const [openSheet,    setOpenSheet]    = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [saving,       setSaving]       = useState(false);
 
   const [catState, setCatState] = useState({
     pip:    { status: 'idle', data: null },
@@ -1051,13 +1068,13 @@ function App() {
 
   const loadCat = useCallback(async (id) => {
     setCatState(prev=>({...prev,[id]:{...prev[id],status:'loading'}}));
-    try { const data=await fetchCat(id); setCatState(prev=>({...prev,[id]:{status:'loaded',data}})); }
-    catch(err){ console.error(err); setCatState(prev=>({...prev,[id]:{status:'error',data:null}})); }
+    try{const data=await fetchCat(id);setCatState(prev=>({...prev,[id]:{status:'loaded',data}}));}
+    catch(err){console.error(err);setCatState(prev=>({...prev,[id]:{status:'error',data:null}}));}
   }, []);
 
-  useEffect(()=>{ CATS.forEach(cat=>loadCat(cat.id)); },[]);// eslint-disable-line
+  useEffect(()=>{CATS.forEach(cat=>loadCat(cat.id));},[]); // eslint-disable-line
 
-  const handleMultiLog = useCallback(async(type,date,catIds)=>{
+  const handleMultiLog=useCallback(async(type,date,catIds)=>{
     const cs=catStateRef.current;
     const updates=catIds.map(id=>{const data=cs[id]?.data;if(!data)return null;return{id,data:{...data,[type]:[...(data[type]||[]),{date}]}};}).filter(Boolean);
     if(!updates.length)return;
@@ -1131,10 +1148,11 @@ function App() {
 
       <header className="wl-header">
         <span className="wl-header-icon">🐾</span>
-        <div>
+        <div className="wl-header-text">
           <div className="wl-header-title">WhiskerLog</div>
           <div className="wl-header-sub">Pip · Parker · Ollie &nbsp;·&nbsp; v{APP_VERSION}</div>
         </div>
+        <button className="wl-header-settings" onClick={() => setShowSettings(true)}>⚙️</button>
       </header>
 
       <div className="wl-page">
@@ -1155,12 +1173,20 @@ function App() {
         <button className={`wl-nav-tab${activeTab==='diary'?' active':''}`} onClick={()=>setActiveTab('diary')}><span className="wl-nav-tab-icon">📓</span>DIARY</button>
       </nav>
 
+      {/* ── Care card sheets ── */}
       {openSheet&&(
         <BottomSheet title={sheetTitle} onClose={()=>setOpenSheet(null)}>
           {openSheet.type==='vet'?(<VetSheet catData={catState[openSheet.catId]?.data} onAdd={e=>handleAddEntry(openSheet.catId,'vet',e)} onDelete={id=>handleDeleteEntry(openSheet.catId,'vet',id)} onClearAll={()=>handleClearField(openSheet.catId,'vet')} saving={saving}/>)
           :openSheet.type==='weight'?(<WeightSheet catData={catState[openSheet.catId]?.data} onAdd={e=>handleAddEntry(openSheet.catId,'weight',e)} onDelete={id=>handleDeleteEntry(openSheet.catId,'weight',id)} onClearAll={()=>handleClearField(openSheet.catId,'weight')} saving={saving}/>)
           :openSheet.type==='journal'?(<JournalSheet catData={catState[openSheet.catId]?.data} onAdd={e=>handleAddEntry(openSheet.catId,'journal',e)} onUpdate={(id,u)=>handleUpdateEntry(openSheet.catId,'journal',id,u)} onDelete={id=>handleDeleteEntry(openSheet.catId,'journal',id)} onClearAll={()=>handleClearField(openSheet.catId,'journal')} saving={saving}/>)
           :(<MultiCareSheet type={openSheet.type} defaultCatId={openSheet.catId} catState={catState} onLog={handleMultiLog} onDelete={handleDelete} onClearAll={handleClearAll} saving={saving}/>)}
+        </BottomSheet>
+      )}
+
+      {/* ── Settings sheet ── */}
+      {showSettings && (
+        <BottomSheet title="⚙️ Settings" onClose={() => setShowSettings(false)}>
+          <SettingsSheet catState={catState} />
         </BottomSheet>
       )}
     </>
