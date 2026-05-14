@@ -638,8 +638,9 @@ function CropModal({ file, onConfirm, onCancel }) {
 }
 
 // ─── SettingsSheet ────────────────────────────────────────────────────────────
-function SettingsSheet({ catState }) {
-  const [exported, setExported] = useState(false);
+function SettingsSheet({ catState, onClearAll }) {
+  const [exported,     setExported]     = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   function handleExport() {
     const payload = {
@@ -665,6 +666,8 @@ function SettingsSheet({ catState }) {
   return (
     <div className="wl-settings-section">
       <div className="wl-section-label">Data</div>
+
+      {/* Export */}
       <button className="wl-settings-row" onClick={handleExport}>
         <div className="wl-settings-row-icon">📤</div>
         <div className="wl-settings-row-body">
@@ -675,6 +678,34 @@ function SettingsSheet({ catState }) {
         </div>
         {exported && <span className="wl-settings-row-check">✓</span>}
       </button>
+
+      {/* Clear All Data */}
+      {!confirmClear ? (
+        <button className="wl-settings-row" onClick={() => setConfirmClear(true)}>
+          <div className="wl-settings-row-icon">🗑️</div>
+          <div className="wl-settings-row-body">
+            <div className="wl-settings-row-label" style={{ color: '#B03020' }}>Clear All Data</div>
+            <div className="wl-settings-row-desc">
+              Reset all three cats to empty — cannot be undone
+            </div>
+          </div>
+        </button>
+      ) : (
+        <div className="wl-settings-row" style={{ cursor: 'default' }}>
+          <div className="wl-settings-row-icon">⚠️</div>
+          <div className="wl-settings-row-body">
+            <div className="wl-settings-row-label" style={{ color: '#B03020' }}>
+              Wipe all data for all three cats?
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+              <button className="wl-clear-no" onClick={() => setConfirmClear(false)}>Cancel</button>
+              <button className="wl-clear-yes" onClick={() => { onClearAll(); setConfirmClear(false); }}>
+                Yes, clear all
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1132,6 +1163,12 @@ function App() {
     setSaving(true);try{await saveCat(catId,updated);}catch(err){console.error(err);}finally{setSaving(false);}
   },[]);
 
+  const handleClearAllData=useCallback(async()=>{
+    const updates=CATS.map(cat=>({id:cat.id,data:emptyCatData(cat.id)}));
+    setCatState(prev=>{const next={...prev};for(const{id,data}of updates)next[id]={...next[id],data};return next;});
+    setSaving(true);try{await Promise.all(updates.map(({id,data})=>saveCat(id,data)));}catch(err){console.error(err);}finally{setSaving(false);}
+  },[]);
+
   const {status,data}=catState[activeCatId];
   const catDataMap=Object.fromEntries(CATS.map(c=>[c.id,catState[c.id].data]));
   const catName=CATS.find(c=>c.id===openSheet?.catId)?.name??'';
@@ -1186,7 +1223,7 @@ function App() {
       {/* ── Settings sheet ── */}
       {showSettings && (
         <BottomSheet title="⚙️ Settings" onClose={() => setShowSettings(false)}>
-          <SettingsSheet catState={catState} />
+          <SettingsSheet catState={catState} onClearAll={handleClearAllData} />
         </BottomSheet>
       )}
     </>
