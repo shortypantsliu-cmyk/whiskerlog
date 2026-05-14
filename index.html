@@ -1,45 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>WhiskerLog</title>
 
-  <!-- PWA / Home Screen -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="WhiskerLog" />
-  <link rel="apple-touch-icon" id="touchIcon" />
-  <meta name="theme-color" content="#C96A3A" />
+    <!-- PWA / home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="WhiskerLog" />
 
-  <title>WhiskerLog</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-
-  <script>
-    // Generate PWA home screen icon at runtime (terracotta bg + paw emoji)
-    window.addEventListener('DOMContentLoaded', () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 180; canvas.height = 180;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#C96A3A';
-      ctx.beginPath();
-      ctx.roundRect(0, 0, 180, 180, 36);
-      ctx.fill();
-      ctx.font = '96px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('🐾', 90, 94);
-      const icon = document.getElementById('touchIcon');
-      if (icon) icon.href = canvas.toDataURL('image/png');
-    });
-  </script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/app.jsx"></script>
-</body>
+    <!-- Cropper.js — image crop for avatar upload -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/app.jsx"></script>
+  </body>
 </html>
