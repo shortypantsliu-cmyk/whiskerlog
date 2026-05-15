@@ -19,11 +19,11 @@ exports.handler = async (event) => {
   }
 
   const { id, data } = body;
-  const validIds = ['pip', 'parker', 'ollie'];
+  const validIds = ['pip', 'parker', 'ollie', 'household'];
   if (!id || !validIds.includes(id)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Invalid cat id. Must be pip, parker, or ollie.' }),
+      body: JSON.stringify({ error: 'Invalid id. Must be pip, parker, ollie, or household.' }),
     };
   }
   if (!data || typeof data !== 'object') {
@@ -45,6 +45,6 @@ exports.handler = async (event) => {
     };
   } catch (err) {
     console.error('save-cat error:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save cat data' }) };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save data' }) };
   }
 };

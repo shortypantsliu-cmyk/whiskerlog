@@ -8,11 +8,11 @@ exports.handler = async (event) => {
   }
 
   const id = event.queryStringParameters?.id;
-  const validIds = ['pip', 'parker', 'ollie'];
+  const validIds = ['pip', 'parker', 'ollie', 'household'];
   if (!id || !validIds.includes(id)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Invalid cat id. Must be pip, parker, or ollie.' }),
+      body: JSON.stringify({ error: 'Invalid id. Must be pip, parker, ollie, or household.' }),
     };
   }
 
@@ -24,22 +24,13 @@ exports.handler = async (event) => {
     });
     const data = await store.get(`cat_${id}`, { type: 'json' });
 
-    if (!data) {
-      // Return empty scaffold for a cat that hasn't been saved yet
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(null),
-      };
-    }
-
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data ?? null),
     };
   } catch (err) {
     console.error('get-cat error:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to load cat data' }) };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to load data' }) };
   }
 };
