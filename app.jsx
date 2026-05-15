@@ -120,8 +120,8 @@ const styles = `
   input,textarea,select{font-family:inherit;}
 
   /* ── HEADER ── */
-  .wl-header{background:linear-gradient(135deg,#C96A3A,#A8532C);color:white;padding:14px 16px 12px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15);}
-  .wl-header-icon{font-size:28px;flex-shrink:0;line-height:1;}
+  .wl-header{background:linear-gradient(135deg,#C96A3A,#A8532C);color:white;padding:14px 16px 12px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .wl-header-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:block;}
   .wl-header-text{flex:1;min-width:0;}
   .wl-header-title{font-weight:800;font-size:17px;line-height:1.1;}
   .wl-header-sub{font-size:13px;opacity:.85;margin-top:1px;}
@@ -129,7 +129,7 @@ const styles = `
   .wl-header-settings:active{opacity:1;}
 
   /* ── VIEW SWITCHER ── */
-  .wl-view-switcher{display:flex;gap:6px;padding:10px 12px 6px;background:#FDF8F0;position:sticky;top:56px;z-index:19;}
+  .wl-view-switcher{display:flex;gap:6px;padding:10px 12px 6px;background:#FDF8F0;position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:19;}
   .wl-view-btn{flex:1;padding:9px 4px;border-radius:12px;border:2px solid #EDD9C5;background:white;font-family:inherit;font-size:13px;font-weight:700;color:#6B4E38;cursor:pointer;transition:all .12s;text-align:center;white-space:nowrap;}
   .wl-view-btn.active{border-color:#C96A3A;background:#FFF5EE;color:#C96A3A;}
 
@@ -1232,7 +1232,7 @@ function App() {
       <style>{styles}</style>
 
       <header className="wl-header">
-        <span className="wl-header-icon">🐾</span>
+        <img className="wl-header-icon" src="/apple-touch-icon.png" alt="WhiskerLog" />
         <div className="wl-header-text">
           <div className="wl-header-title">WhiskerLog</div>
           <div className="wl-header-sub">Pip · Parker · Ollie &nbsp;·&nbsp; v{APP_VERSION}</div>
