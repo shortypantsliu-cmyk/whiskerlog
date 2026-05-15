@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const APP_VERSION = '0.1';
+const APP_VERSION = '1.0';
 const BLOB_TOKEN = import.meta.env.VITE_BLOB_TOKEN;
 
 const CATS = [
